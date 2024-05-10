@@ -122,12 +122,15 @@ export default function HidenImages() {
     }
       
 
+    console.log("data cuuyy");
+    console.log(data);
+    
 
     
     return (
     <div className='w-screen flex flex-col gap-2 items-center justify-center '>
         <p className='font-bold text-5xl mb-9'>face detect</p>
-        <p className='font-medium text-xl mb-9'>total: {data.length} images</p>
+        <p className='font-medium text-xl mb-9'>total: {data.result.data.length} images</p>
 
         <div>
             {reference && <Image 

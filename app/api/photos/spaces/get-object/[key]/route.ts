@@ -5,9 +5,7 @@ import Papa from 'papaparse';
 
 
 export async function GET(request: Request,{ params }: { params: { key: string } }) {
-    console.log(
-        "\n\n\n\n\n\n\n\ncoook"
-    );
+    
     
     try {
         const input = {
@@ -19,6 +17,10 @@ export async function GET(request: Request,{ params }: { params: { key: string }
                     .Body?.transformToString() // transform into string for can be parse into json
     
           let result = Papa.parse(response ?? "",{delimiter: ""})
+
+          console.log(
+            "\n\n\n\n\n\n\n\ncoook"
+        );
           return NextResponse.json({"result":result})
     } catch (error) {
         return NextResponse.json(error)

@@ -15,7 +15,7 @@ export async function GET(request: Request,{ params }: { params: { gdrive_file_i
         }
         )
       } catch (error) {
-        return Response.json({ error: 'Failed to fetch image' });
+      Response.json({ error: 'Failed to fetch image' });
       }
   return Response.json({"messagee" : params.gdrive_file_id})
 }
