@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button"
 
-export function LoginPage() {
+export default function LoginPage() {
   return (
     <div className="w-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
