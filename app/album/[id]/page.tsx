@@ -46,6 +46,8 @@ export default async function page({ params }: { params: { id: string } }) {
         return null
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const albumInfo:Albums[] | null = await getAlbumInfo() as unknown as Albums 
     if (albumInfo == null) {
         notFound()

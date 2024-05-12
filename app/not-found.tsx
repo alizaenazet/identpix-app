@@ -5,7 +5,7 @@ export default function NotFound() {
     <div>
       <h2>Not Found</h2>
       <p>Could not find requested resource</p>
-      <link href="/identpix-mvp.vercel.app">Return Home</link>
+      <a href="/identpix-mvp.vercel.app">Return Home</a>
     </div>
   )
 }
