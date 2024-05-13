@@ -12,11 +12,12 @@ import { redirect } from "next/navigation";
 import { notFound } from 'next/navigation'
 import { Albums } from "@/app/definitions/types";
 import Link from "next/link";
+import { unstable_noStore as noStore } from 'next/cache';
 
 export default async function page({ params }: { params: { id: string } }) {
     async function getAlbumInfo() {
         try {
-            
+            noStore()
             const result = await sql`
             SELECT 
             albums.id,
@@ -71,7 +72,7 @@ export default async function page({ params }: { params: { id: string } }) {
             </Link>
         </CardContent>
         <CardFooter>
-            <p className="text-sm font-light">You are in demo version, sometimes you will get some problem. You can report to us support@identpix.com <a href="support@identpix.com">support@identpix.com</a></p>
+            <p className="text-sm font-light">You are in demo version, sometimes you will get some problem. You can report to us <a href="support@identpix.com">support@identpix.com</a></p>
         </CardFooter>
     </Card>
 
