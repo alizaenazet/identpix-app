@@ -125,7 +125,7 @@ export default function Page({ params }: { params: { id: string } }) {
                                 <CardDescription></CardDescription>
                             </CardHeader>
                             <CardContent>
-                            <img className="w-full h-fit rounded-md" id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                            <img className="w-full h-fit aspect-square object-contain rounded-md" id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
                             </CardContent>
                             <CardFooter>
                             <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
