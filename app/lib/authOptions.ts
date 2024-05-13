@@ -10,7 +10,9 @@ const scopes = [
     "https://www.googleapis.com/auth/drive.apps.readonly",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/drive.photos.readonly",
-    "https://www.googleapis.com/auth/drive.readonly"
+    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/drive.metadata",
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
   ];
 
 export const authOptions: NextAuthOptions = {  // Configure one or more authentication providers
@@ -29,13 +31,14 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
         }),
     ],
     callbacks: {
-        async jwt({ token, account }) {
+        async jwt({ token, account, profile }) {
             if (account) {
                 token.accessToken = account.access_token;
             }
+            
             return token;
         },
-        async session({ session, token }) {
+        async session({ session, token, }) {
             session.user = token;
             // session.accessToken = token.accessToken;
             return session;
