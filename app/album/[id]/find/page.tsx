@@ -15,19 +15,15 @@ export default function Page({ params }: { params: { id: string } }) {
         redirect(`/album/${params.id}/find/result`)
     }
     if (currentStep == 1) { // saat telah tidak sesuai halaman tidak ditampilakn
-        return <div>
-            <FirstStepWebCam  // namun semua logic masih
+        return <div className='w-screen h-screen flex flex-col items-center justify-center py-3 px-2 gap-6'>
+            <p className='w-full text-center text-base font-semibold'>Open the camera so we can detect your face</p>
+            <FirstStepWebCam
+            albumId={params.id}  // namun semua logic masih
             setCurrentStep={setCurrentStep}
             setReference={setRefence}/>
+            <p className='w-full text-center font-normal text-sm text-slate-600'>Point your face at the camera and then we will detect your face, make sure you are in good lighting and conditions.</p>
         </div>    
     }
-
-    if (currentStep == 2) {
-        return <div>
-            <h1>Step to confirm the picture to be a ference</h1>
-        </div>
-    }
-
 
 
     useEffect(() => {
@@ -40,20 +36,18 @@ export default function Page({ params }: { params: { id: string } }) {
         
         (async () => {
           // loading the models
-
           await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
           await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
           await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
           await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
           await faceapi.nets.faceExpressionNet.loadFromUri('/models');
-            
         })();
       }, []);
 
     
   return (
     <div>
-        <h1>The last step for start find the images</h1>
+        
     </div>
   )
 }

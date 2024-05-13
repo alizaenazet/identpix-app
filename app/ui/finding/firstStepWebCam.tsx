@@ -4,9 +4,11 @@ import { redirect } from 'next/navigation';
 
 
 export default function FirstStepWebCam({
+    albumId,
     setReference,
     setCurrentStep,
 }:{
+    albumId: string,
     setReference: (reference:any) => void,
     setCurrentStep: (step:number) => void
 }){
@@ -18,9 +20,14 @@ export default function FirstStepWebCam({
 
   // LOAD FROM USEEFFECT
   useEffect(()=>{
-    if (isCameraActive) {    
-        startVideo()
-        videoRef && loadModels()
+    try {
+        if (isCameraActive) {    
+            startVideo()
+            videoRef && loadModels()
+        }
+    } catch (error) {
+        redirect(`/album/${albumId}/find/result`)
+        
     }
   },[])
 
@@ -59,12 +66,14 @@ export default function FirstStepWebCam({
   }
 
   const faceMyDetect = ()=>{
-    setInterval(async()=>{
-      const camera = await faceapi.detectSingleFace(videoRef.current,
-        new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-        
+    const intervalId = setInterval(async()=>{
+    try {
+        const camera = await faceapi.detectSingleFace(videoRef.current,
+            new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();        
+    
+
         
         if (camera!.detection.score > 0.7) {
             const jsonLabel = new faceapi.LabeledFaceDescriptors('reference',[camera?.descriptor!]).toJSON()
@@ -72,10 +81,12 @@ export default function FirstStepWebCam({
             localStorage.setItem("referenceObject", JSON.stringify(jsonLabel))
             setReference(camera)
             setCurrentStep(2)
+            clearInterval(intervalId)
+            redirect(`/album/${albumId}/find/result`)
         }
         
         
-      // DRAW YOU FACE IN WEBCAM
+      // DRAW FACE IN WEBCAM
       canvasRef.current.innerHtml = faceapi.createCanvasFromMedia(videoRef.current)
       faceapi.matchDimensions(canvasRef.current,{
         width:470,
@@ -89,13 +100,15 @@ export default function FirstStepWebCam({
 
       faceapi.draw.drawDetections(canvasRef.current,resized!)
       faceapi.draw.drawFaceLandmarks(canvasRef.current,resized!)
-
-    },500)
+    } catch (error) {
+        clearInterval(intervalId)
+    }
+    },1500)
   }
 
   
   return (
-    <div className="flex w-screen h-screen flex-col items-center justify-center">
+    <div className="flex w-screen h-max flex-col items-center justify-center">
       <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
       <canvas ref={canvasRef} width="470" height="325"
       className="absolute"/>

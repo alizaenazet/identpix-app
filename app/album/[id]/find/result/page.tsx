@@ -4,6 +4,18 @@ import { redirect } from "next/navigation"
 import { useRef,useEffect, useState } from "react"
 import useSWR from 'swr'
 import * as faceapi from 'face-api.js';
+import Image from "next/image";
+import { useRouter } from 'next/router';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
+  
+  import { Button } from "@/components/ui/button";
 
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -29,9 +41,11 @@ export default function Page({ params }: { params: { id: string } }) {
 
         if (!isFirstRender) {
             isReadyToImportModel.current = false; // toggle flag after first render/mounting
+            useRouter().reload()
             return;
         }
         
+
         (async () => {
           // loading the models
 
@@ -88,35 +102,48 @@ export default function Page({ params }: { params: { id: string } }) {
       
 
   return (
-    <div className='w-screen flex flex-col gap-2 items-center justify-center '>
-        <p className='font-bold text-5xl mb-9'>face detect</p>
-        <p className='font-medium text-xl mb-9'>total: {data.result.data[0].length} images</p>
+    <div className='w-screen flex flex-col gap-2 items-center justify-center py-6 px-2'>
+        <p className='font-bold text-xl mb-9 text-center'>Discover all your saved photos <br /> here 🔍</p>
+        <div className="w-full flex flex-col gap-2 items-center justify-center">
 
-        <button className='p-3 bg-red-100 font-bold text-blue-600' onClick={async () => {
-                detect()
-            }}>classify</button>
-        
+        <Button className="w-[50%]" onClick={async () => {
+            detect()
+        }}>Start find my Photos</Button>
+        <p className='font-medium text-normal '>Collection total : {data.result.data[0].length} images</p>
+        </div>
         {
             isProcess && <p>🔍 Processing to find your images 🔍</p>
         }   
         
         {
-            (data.result.data[0].length > 0 && imagesOfMatch.length < 1) && data.result.data[0].map((id:any,index:number) => 
-                <div className='mt-3' hidden={isProcess}>
-                    <p className='font-black'>{index + 1}</p>
-                    <img id={`images-${index}`} src={`/api/photos/forward-image/${id}`} alt=""/>
-                </div>
-            )
-        }
-        {
             (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && data.result.data[0].map((id: any,index:number) => {
                 if (imagesOfMatch.includes(index)) {
-                    return <div className='mt-3'>
-                        <p className='font-black'>{index + 1}</p>
-                        <img id={`images-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                    return <div className='m-3'  key={id+index}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle></CardTitle>
+                                <CardDescription></CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                            <img className="w-full h-fit rounded-md" id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                            </CardContent>
+                            <CardFooter>
+                            <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
+                                <Button>Download</Button>
+                            </a>
+                            </CardFooter>
+                        </Card>   
                         </div>
                     }
                 }
+            ) 
+        }
+        {
+            (data.result.data[0].length > 0) && data.result.data[0].map((id:any,index:number) => 
+                <div className='mt-3' hidden key={id + index} >
+                    <p className='font-black'>{index + 1}</p>
+                    <img id={`images-${index}`} src={`/api/photos/forward-image/${id}`}   alt=""/>
+                </div>
             )
         }
 
