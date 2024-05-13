@@ -103,13 +103,13 @@ export default function FirstStepWebCam({
     } catch (error) {
         clearInterval(intervalId)
     }
-    },1500)
+    },500)
   }
 
   
   return (
     <div className="flex w-screen h-max flex-col items-center justify-center">
-      <video crossOrigin="anonymous" ref={videoRef} autoPlay></video>
+      <video crossOrigin="anonymous" ref={videoRef} autoPlay={true} ></video>
       <canvas ref={canvasRef} width="470" height="325"
       className="absolute"/>
     </div>
