@@ -39,7 +39,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   }
 
   const albumDetail = data[0]  
-
+  const albumLinks = albumDetail.links ?? []
   return (
     <Sheet>
     <SheetTrigger asChild disabled={isDeleting} >
@@ -100,7 +100,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
           </SheetClose>
             <Button className="bg-green-600" 
             type="button"
-            disabled={!albumDetail.ispublished && albumDetail.links.length < 1}
+            disabled={!albumDetail.ispublished && albumLinks?.length < 1}
             onClick={ async () => {
               console.log("rine loh cok");
               setIsLoadingSynchronize(true)
@@ -131,7 +131,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
         gdriveId={albumDetail.gdrive_id ?? -1}
         isNewAlbum={albumDetail.gdrive_id == null}
         albumId={album.id}
-        links={albumDetail.links ?? []}
+        links={albumLinks ?? []}
         />
       </div>
       </SheetFooter>
