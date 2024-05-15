@@ -57,7 +57,7 @@ export default function FirstStepWebCam({
       faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
       faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models")
       ]).then(()=>{
         if (isCameraActive) {
             faceMyDetect()
@@ -69,7 +69,7 @@ export default function FirstStepWebCam({
     const intervalId = setInterval(async()=>{
     try {
         const camera = await faceapi.detectSingleFace(videoRef.current,
-            new faceapi.TinyFaceDetectorOptions())
+            new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();        
     

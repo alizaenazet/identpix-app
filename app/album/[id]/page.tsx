@@ -55,10 +55,6 @@ export default async function page({ params }: { params: { id: string } }) {
     }
 
     const albumDetail = albumInfo[0]
-
-    console.log("albumInfo");
-    console.log(albumInfo);
-    
     return (
     <div className='w-screen h-screen flex flex-col items-center justify-center'>
     <Card>
