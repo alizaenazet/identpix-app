@@ -50,8 +50,7 @@ export default function Page({ params }: { params: { id: string } }) {
           // loading the models
 
           await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-          await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-          await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+        //   await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
           await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
           await faceapi.nets.faceExpressionNet.loadFromUri('/models');
             
@@ -78,23 +77,22 @@ export default function Page({ params }: { params: { id: string } }) {
       async function detect() {
         setIsProcess(true)
         const faceMatcher = new faceapi.FaceMatcher(new Float32Array(reference.descriptors[0]))
-        let result : any[] = []
         let indexOfMatches: number[] = []
         for (let index = 0; index < data.result.data[0].length; index++) {
-            const detections = await faceapi.detectAllFaces(`images-${index}`,new faceapi.TinyFaceDetectorOptions())
+            const detections = await faceapi.detectAllFaces(`images-${index}`,new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptors();
             detections.forEach(fd => {
                 const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
-
-                if (bestMatch.toString().includes("person 1")) {
+                if (bestMatch.label == "person 1" && bestMatch.distance <= 0.51) {
                     indexOfMatches.push(index)
+                    setImagesOfMatch([...indexOfMatches])
                 }
             })
         }
 
         if (indexOfMatches.length > 0) {
-            setImagesOfMatch(indexOfMatches)
+            setImagesOfMatch([...indexOfMatches])
         }
         setIsProcess(false)
       }
@@ -106,7 +104,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <p className='font-bold text-xl mb-9 text-center'>Discover all your saved photos <br /> here 🔍</p>
         <div className="w-full flex flex-col gap-2 items-center justify-center">
 
-        <Button className="w-[50%]" onClick={async () => {
+        <Button className=" md:w-19" onClick={async () => {
             detect()
         }}>Start find my Photos</Button>
         <p className='font-medium text-normal '>Collection total : {data.result.data[0].length} images</p>
@@ -114,30 +112,33 @@ export default function Page({ params }: { params: { id: string } }) {
         {
             isProcess && <p>🔍 Processing to find your images 🔍</p>
         }   
-        
-        {
-            (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && data.result.data[0].map((id: any,index:number) => {
-                if (imagesOfMatch.includes(index)) {
-                    return <div className='m-3'  key={id+index}>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle></CardTitle>
-                                <CardDescription></CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                            <img className="w-full h-fit aspect-square object-contain rounded-md" id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
-                            </CardContent>
-                            <CardFooter>
-                            <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
-                                <Button>Download</Button>
-                            </a>
-                            </CardFooter>
-                        </Card>   
-                        </div>
-                    }
+            { (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && <div className="w-screen h-screen flex flex-row gap-2 flex-wrap  px-9 justify-center mt-3 ">
+                {
+                    (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && data.result.data[0].map((id: any,index:number) => {
+                        if (imagesOfMatch.includes(index)) {
+                            return <div className=''  key={id+index}>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle></CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                    <Image className="w-full h-fit aspect-square  rounded-lg md:hidden object-cover" width={300} height={300}  id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                                    <Image className="w-full h-fit aspect-square  rounded-lg hidden md:block object-cover" width={300} height={300} id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                                    </CardContent>
+                                    <CardFooter>
+                                    <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
+                                        <Button>Download</Button>
+                                    </a>
+                                    </CardFooter>
+                                </Card>   
+                                </div>
+                            }
+                        }
+                    ) 
                 }
-            ) 
-        }
+                </div>
+            }
+        
         {
             (data.result.data[0].length > 0) && data.result.data[0].map((id:any,index:number) => 
                 <div className='mt-3' hidden key={id + index} >
