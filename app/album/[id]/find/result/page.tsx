@@ -50,7 +50,7 @@ export default function Page({ params }: { params: { id: string } }) {
           // loading the models
 
           await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-          await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        //   await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
           await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
           await faceapi.nets.faceExpressionNet.loadFromUri('/models');
             
@@ -77,7 +77,6 @@ export default function Page({ params }: { params: { id: string } }) {
       async function detect() {
         setIsProcess(true)
         const faceMatcher = new faceapi.FaceMatcher(new Float32Array(reference.descriptors[0]))
-        let result : any[] = []
         let indexOfMatches: number[] = []
         for (let index = 0; index < data.result.data[0].length; index++) {
             const detections = await faceapi.detectAllFaces(`images-${index}`,new faceapi.SsdMobilenetv1Options())
@@ -113,33 +112,32 @@ export default function Page({ params }: { params: { id: string } }) {
         {
             isProcess && <p>🔍 Processing to find your images 🔍</p>
         }   
-            { (data.result.data[0].length > 0 && imagesOfMatch.length > 0) ? <div className="w-screen h-screen flex flex-row gap-2 flex-wrap  px-9 justify-center mt-3 ">
+            { (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && <div className="w-screen h-screen flex flex-row gap-2 flex-wrap  px-9 justify-center mt-3 ">
                 {
-                (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && data.result.data[0].map((id: any,index:number) => {
-                    if (imagesOfMatch.includes(index)) {
-                        return <div className=''  key={id+index}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle></CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                <Image className="w-full h-fit aspect-square  rounded-lg md:hidden object-cover" width={300} height={300}  id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
-                                <Image className="w-full h-fit aspect-square  rounded-lg hidden md:block object-cover" width={300} height={300} id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
-                                </CardContent>
-                                <CardFooter>
-                                <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
-                                    <Button>Download</Button>
-                                </a>
-                                </CardFooter>
-                            </Card>   
-                            </div>
+                    (data.result.data[0].length > 0 && imagesOfMatch.length > 0) && data.result.data[0].map((id: any,index:number) => {
+                        if (imagesOfMatch.includes(index)) {
+                            return <div className=''  key={id+index}>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle></CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                    <Image className="w-full h-fit aspect-square  rounded-lg md:hidden object-cover" width={300} height={300}  id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                                    <Image className="w-full h-fit aspect-square  rounded-lg hidden md:block object-cover" width={300} height={300} id={`images-result-${index}`} src={`/api/photos/forward-image/${id}`} alt="" />
+                                    </CardContent>
+                                    <CardFooter>
+                                    <a href={`https://drive.usercontent.google.com/download?id=${id}&export=download&authuser=1`}>
+                                        <Button>Download</Button>
+                                    </a>
+                                    </CardFooter>
+                                </Card>   
+                                </div>
+                            }
                         }
-                    }
-                ) 
+                    ) 
+                }
+                </div>
             }
-            </div> : <div className="w-full h-full flex items-center justify-center">
-                        <p>images not found</p>
-                 </div>}
         
         {
             (data.result.data[0].length > 0) && data.result.data[0].map((id:any,index:number) => 
