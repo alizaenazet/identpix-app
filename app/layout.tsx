@@ -5,6 +5,7 @@ import SessionWrapper from "@/app/ui/sessionWrapper";
 import { SessionProvider } from "next-auth/react"
 import Navbar  from "@/app/ui/navbar";
 const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +20,10 @@ export default function RootLayout({
   return (
     <SessionWrapper>
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+      </body>
+      <Toaster />
     </html>
     </SessionWrapper>
   );

@@ -25,9 +25,7 @@ import {
   } from "@/components/ui/dropdown-menu"
   
   import { Albums } from "@/app/definitions/types";
-
-
-
+import LoadingDisplay from '@/app/ui/loadingDisplay';
   
 
 export default function DashboardPage( {userSession}:{userSession: UserSession}) {
@@ -37,11 +35,11 @@ export default function DashboardPage( {userSession}:{userSession: UserSession})
     
     
     if (isLoading && !error) {
-        return  <p>Loading....</p>
+        return  <LoadingDisplay />
     }
     
   return (
-    <div className='py-3 px-7 flex flex-col items-center justify-start gap-7'>
+    <main className='py-3 px-7 flex flex-col items-center justify-start gap-7'>
         <h1 className='font-bold text-xl md:text-5xl'>Dashboard</h1>
         <div className='w-full h-screen flex flex-col items-start justify-start gap-9'>
         <div className='w-full flex flex-row  flex-wrap gap-2 items-end justify-between'>
@@ -105,6 +103,6 @@ export default function DashboardPage( {userSession}:{userSession: UserSession})
       </Table>
 
         </div>
-    </div>
+    </main>
   )
 }
