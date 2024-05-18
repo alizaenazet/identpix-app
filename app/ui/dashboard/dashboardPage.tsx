@@ -42,10 +42,10 @@ export default function DashboardPage( {userSession}:{userSession: UserSession})
     
   return (
     <div className='py-3 px-7 flex flex-col items-center justify-start gap-7'>
-        <h1 className='font-bold text-5xl'>Dashboard page </h1>
+        <h1 className='font-bold text-xl md:text-5xl'>Dashboard</h1>
         <div className='w-full h-screen flex flex-col items-start justify-start gap-9'>
-        <div className='w-full flex flex-row gap-2 items-end justify-between'>
-            <div className='w-full flex flex-row gap-2 items-end justify-start'>
+        <div className='w-full flex flex-row  flex-wrap gap-2 items-end justify-between'>
+            <div className='w-max flex flex-row gap-2 items-end justify-start'>
                 <DropdownMenu>
                 <DropdownMenuTrigger>
                 <Image
@@ -56,25 +56,32 @@ export default function DashboardPage( {userSession}:{userSession: UserSession})
                 className='rounded-lg'
                 />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className='pl-2'>
                     <DropdownMenuLabel>Menu</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => signOut()}>Sing-out</DropdownMenuItem>
+                    <DropdownMenuItem className='bg-slate-100 mb-1' onClick={() => signOut()}>Sing-out</DropdownMenuItem>
                 </DropdownMenuContent>
                 </DropdownMenu>
             <div className='flex flex-col  items-start justify-center'>
-                <p>{userSession.user?.name}</p>
-                <p>{userSession.user?.email}</p>
+                <p className='text-sm md:text-base font-semibold'>{userSession.user?.name}</p>
+                <p className='text-sm md:md:text-base text-normal'>{userSession.user?.email}</p>
             </div>
             </div>
 
-            <Link href={"/albums/create"}>
-                <Button>
+            <Link className='hidden md:block' href={"/albums/create"}>
+                <Button className='md:text-sm'>
                     Create album
                 </Button>
             </Link>
         </div>
-        <h3 className='font-semibold text-3xl mb-0 pb-0'>Albums</h3>
+        <div className='w-full flex flex-col gap-1 items-start justify-start'>
+          <h3 className='font-semibold text-3xl mb-0 pb-0'>Albums</h3>
+          <Link className=' md:hidden' href={"/albums/create"}>
+                  <Button size={'sm'} className=' text-xs'>
+                      Create album
+                  </Button>
+          </Link>
+        </div>
         <Table className='w-full h-max'>
         <TableCaption>A list of your recent Albums.</TableCaption>
         <TableHeader>
@@ -88,9 +95,9 @@ export default function DashboardPage( {userSession}:{userSession: UserSession})
         <TableBody>
           {data && data.map((album:Albums) => (
             <TableRow key={album.id}>
-              <TableCell className="font-medium">{album.title}</TableCell>
-              <TableCell>{album.description}</TableCell>
-              <TableCell>{album.ispublished ? "🌍 published" : "📦 draft"}</TableCell>
+              <TableCell className="font-medium text-xs md:text-sm">{album.title}</TableCell>
+              <TableCell className='text-xs md:text-sm'>{album.description}</TableCell>
+              <TableCell className='text-xs md:text-sm'>{album.ispublished ? "🌍 published" : "📦 draft"}</TableCell>
               <TableCell className="text-right"><AlbumUpdateSheet album={album} /></TableCell>
             </TableRow>
           ))}

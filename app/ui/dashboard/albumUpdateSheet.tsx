@@ -56,7 +56,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
             <div className="w-full ">
                 {album.ispublished && <p className="text-sm font-light text-green-500">
                 Share your album: <b/>
-                  <a className="font-medium" href={`identpix-app.vercel.app/album/${album.id}`}>
+                  <a className="font-medium" href={`https://identpix-app.vercel.app/album/${album.id}`}>
                      identpix-app.vercel.app/album/{album.id}
                   </a>
 
