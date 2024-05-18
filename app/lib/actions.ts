@@ -333,6 +333,7 @@ export async function deleteAlbum(albumId:string) {
             revalidatePath('/dashboard');
             return true
         }
+        revalidatePath('/dashboard')
         return false
     } catch (error) {
         console.log("🔥 error happen :");

@@ -14,6 +14,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+
+
 import { deleteAlbum,updatetAlbum, synchAlbumFiles } from "@/app/lib/actions";
 import LinkList from "@/app/ui/album/linkLinst";
 import useSWR from 'swr'
@@ -21,6 +34,7 @@ import { Albums } from "@/app/definitions/types";
 import { useState } from "react";
 import { useFormState } from "react-dom";
 import CopyButton from "@/app/ui/dashboard/copyButton";
+import { revalidatePath } from "next/cache";
 
 
 export default  function AlbumUpdateSheet({album} : {album: Albums}) {
@@ -47,6 +61,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
       <Button variant="outline">{isDeleting ? "Deleting.." : "✏️ Edit"}</Button>
     </SheetTrigger>
     <SheetContent side={'bottom'} className="h-[65%]">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
       <ScrollArea className="h-[100%]  cok">
         <SheetHeader>
           <SheetTitle>
@@ -71,13 +86,17 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
               </div>
             </div>
           </SheetTitle>
-          <SheetDescription>
+          <SheetDescription className="text-start">
             Make changes to your album here. Click save when you're done.
+            <Separator className="my-4" />
           </SheetDescription>
+          
         </SheetHeader>
+        <Card>
+        <CardContent>
 
         <form className="grid gap-4 py-4" action={dispatch}>
-          <Input id="albumId" name="albumId" value={album.id} className="col-span-3 hidden" />
+          <Input id="albumId" name="albumId" defaultValue={album.id} className="col-span-3 hidden" />
           <div className="grid grid-cols-4 items-center gap-4 pr-1">
             <Label htmlFor="title" className="text-right">
               Title
@@ -109,22 +128,20 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
                 const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
                 setIsLoadingSynchronize(false)
               }}>
-                  {isLoadingSynchronize ? "Loading🔄 Synchronizing album..., please wait🙏" : "Synchronize album"}
+                  {isLoadingSynchronize ? <span className="animate-spin material-symbols-outlined">sync</span>: "Synchronize album"}
                 </Button>
             </div>
           </div>
         </form>
+        </CardContent>
+        </Card>
 
         {state?.errors &&
           <p className="text-sm text-slate-200">{state.message}</p>
         }
 
-
-        {isLoadingSynchronize && <p className="w-full text-center text-base font-semibold text-slate-400">
-          Loading🔄 Synchronizing album...,<br />please wait🙏
-        </p>}
         <SheetFooter>
-        <div className="w-full flex flex-col items-start justify-center ">
+        <div className=" w-full flex flex-col items-start justify-center ">
           <LinkList 
           gdriveId={albumDetail.gdrive_id ?? -1}
           isNewAlbum={albumDetail.gdrive_id == null}
