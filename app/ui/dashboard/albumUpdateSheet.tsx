@@ -20,6 +20,7 @@ import useSWR from 'swr'
 import { Albums } from "@/app/definitions/types";
 import { useState } from "react";
 import { useFormState } from "react-dom";
+import CopyButton from "@/app/ui/dashboard/copyButton";
 
 
 export default  function AlbumUpdateSheet({album} : {album: Albums}) {
@@ -42,26 +43,28 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const albumLinks = albumDetail.links ?? []
   return (
     <Sheet>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <SheetTrigger asChild disabled={isDeleting} >
       <Button variant="outline">{isDeleting ? "Deleting.." : "✏️ Edit"}</Button>
     </SheetTrigger>
     <SheetContent side={'bottom'} className="max-h-[75%]">
       <SheetHeader>
         <SheetTitle>
-          <div className="w-full gap-3">
+          <div className="w-full gap-3 flex flex-col items-start justify-start">
             <div className="w-full flex flex-col gap-1 items-start justify-end">
               <p className="text-base ">Edit album</p>
               <p className="text-base font-medium">Status: {album.ispublished ? "🌍 published" : "📦 draft"}</p>
             </div>
-            <div className="w-full ">
-                {album.ispublished && <p className="text-sm font-light text-green-500">
-                Share your album: <b/>
-                  <a className="font-medium" href={`https://identpix-app.vercel.app/album/${album.id}`}>
-                     identpix-app.vercel.app/album/{album.id}
-                  </a>
-
-                  
-                  </p>}
+            <div className="w-full felx ">
+                {album.ispublished && <p  className="w-full text-start text-sm md:text-base font-light text-green-500">
+                    Share your album: 
+                      <a className="font-medium" href={`https://identpix-app.vercel.app/album/${album.id}`}>
+                        identpix-app.vercel.app/album/{album.id}
+                      </a>
+                      <br className=""/>
+                      <CopyButton text={`https://identpix-app.vercel.app/album/${album.id}`}/>
+                    </p>
+                  }
                 {!album.ispublished && <p className="text-sm font-light text-red-500">
                   Your album need to Synchronize for can be accessible publicly
                   </p>}
