@@ -46,94 +46,95 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
     <SheetTrigger asChild disabled={isDeleting} >
       <Button variant="outline">{isDeleting ? "Deleting.." : "✏️ Edit"}</Button>
     </SheetTrigger>
-    <SheetContent side={'bottom'} className="max-h-[75%]">
-      <SheetHeader>
-        <SheetTitle>
-          <div className="w-full gap-3 flex flex-col items-start justify-start">
-            <div className="w-full flex flex-col gap-1 items-start justify-end">
-              <p className="text-base ">Edit album</p>
-              <p className="text-base font-medium">Status: {album.ispublished ? "🌍 published" : "📦 draft"}</p>
+    <SheetContent side={'bottom'} className="h-[65%]">
+      <ScrollArea className="h-[100%]  cok">
+        <SheetHeader>
+          <SheetTitle>
+            <div className="w-full gap-3 flex flex-col items-start justify-start">
+              <div className="w-full flex flex-col gap-1 items-start justify-end">
+                <p className="text-base ">Edit album</p>
+                <p className="text-base font-medium">Status: {album.ispublished ? "🌍 published" : "📦 draft"}</p>
+              </div>
+              <div className="w-full felx ">
+                  {album.ispublished && <p  className="w-full text-start text-sm md:text-base font-light text-green-500">
+                      Share your album: 
+                        <a className="font-medium" href={`https://identpix-app.vercel.app/album/${album.id}`}>
+                          identpix-app.vercel.app/album/{album.id}
+                        </a>
+                        <br className=""/>
+                        <CopyButton text={`https://identpix-app.vercel.app/album/${album.id}`}/>
+                      </p>
+                    }
+                  {!album.ispublished && <p className="text-sm font-light text-red-500">
+                    Your album need to Synchronize for can be accessible publicly
+                    </p>}
+              </div>
             </div>
-            <div className="w-full felx ">
-                {album.ispublished && <p  className="w-full text-start text-sm md:text-base font-light text-green-500">
-                    Share your album: 
-                      <a className="font-medium" href={`https://identpix-app.vercel.app/album/${album.id}`}>
-                        identpix-app.vercel.app/album/{album.id}
-                      </a>
-                      <br className=""/>
-                      <CopyButton text={`https://identpix-app.vercel.app/album/${album.id}`}/>
-                    </p>
-                  }
-                {!album.ispublished && <p className="text-sm font-light text-red-500">
-                  Your album need to Synchronize for can be accessible publicly
-                  </p>}
+          </SheetTitle>
+          <SheetDescription>
+            Make changes to your album here. Click save when you're done.
+          </SheetDescription>
+        </SheetHeader>
+
+        <form className="grid gap-4 py-4" action={dispatch}>
+          <Input id="albumId" name="albumId" value={album.id} className="col-span-3 hidden" />
+          <div className="grid grid-cols-4 items-center gap-4 pr-1">
+            <Label htmlFor="title" className="text-right">
+              Title
+            </Label>
+            <Input id="title" name="title" defaultValue={album.title} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4 pr-1">
+            <Label htmlFor="description" className="text-right ">
+              Description
+            </Label>
+            <Input id="description" name="description" defaultValue={album.description} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-start justify-start gap-4 ">
+          <Label  className="text-right">
+            </Label>
+            <div className="col-span-3 flex flex-row gap-1 justify-start items-start flex-wrap">
+            <SheetClose asChild >
+              <Button variant="destructive" size="sm" onClick={async () => {setIsDeleting(true) ; await deleteAlbum(album.id)}}> Delete</Button>
+            </SheetClose>
+            <SheetClose disabled={isLoadingSynchronize} asChild>
+              <Button size="sm" type="submit">Save changes</Button>
+            </SheetClose>
+              <Button className="bg-green-600" 
+              type="button"
+              size="sm"
+              disabled={!albumDetail.ispublished && albumLinks?.length < 1}
+              onClick={ async () => {
+                setIsLoadingSynchronize(true)
+                const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
+                setIsLoadingSynchronize(false)
+              }}>
+                  {isLoadingSynchronize ? "Loading🔄 Synchronizing album..., please wait🙏" : "Synchronize album"}
+                </Button>
             </div>
           </div>
-        </SheetTitle>
-        <SheetDescription>
-          Make changes to your album here. Click save when you're done.
-        </SheetDescription>
-      </SheetHeader>
-      <ScrollArea className="h-fit w-full pr-3 rounded-md border">
+        </form>
 
-      <form className="grid gap-4 py-4" action={dispatch}>
-        <Input id="albumId" name="albumId" value={album.id} className="col-span-3 hidden" />
-        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-          <Label htmlFor="title" className="text-right">
-            Title
-          </Label>
-          <Input id="title" name="title" defaultValue={album.title} className="col-span-3" />
+        {state?.errors &&
+          <p className="text-sm text-slate-200">{state.message}</p>
+        }
+
+
+        {isLoadingSynchronize && <p className="w-full text-center text-base font-semibold text-slate-400">
+          Loading🔄 Synchronizing album...,<br />please wait🙏
+        </p>}
+        <SheetFooter>
+        <div className="w-full flex flex-col items-start justify-center ">
+          <LinkList 
+          gdriveId={albumDetail.gdrive_id ?? -1}
+          isNewAlbum={albumDetail.gdrive_id == null}
+          albumId={album.id}
+          links={albumLinks ?? []}
+          />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-          <Label htmlFor="description" className="text-right ">
-            Description
-          </Label>
-          <Input id="description" name="description" defaultValue={album.description} className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-start justify-start gap-4 ">
-        <Label  className="text-right">
-          </Label>
-          <div className="col-span-3 flex flex-row gap-1 justify-start items-start flex-wrap">
-          <SheetClose asChild >
-            <Button variant="destructive" size="sm" onClick={async () => {setIsDeleting(true) ; await deleteAlbum(album.id)}}> Delete</Button>
-          </SheetClose>
-          <SheetClose disabled={isLoadingSynchronize} asChild>
-            <Button size="sm" type="submit">Save changes</Button>
-          </SheetClose>
-            <Button className="bg-green-600" 
-            type="button"
-            size="sm"
-            disabled={!albumDetail.ispublished && albumLinks?.length < 1}
-            onClick={ async () => {
-              setIsLoadingSynchronize(true)
-              const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
-              setIsLoadingSynchronize(false)
-            }}>
-                {isLoadingSynchronize ? "Loading🔄 Synchronizing album..., please wait🙏" : "Synchronize album"}
-              </Button>
-          </div>
-        </div>
-      </form>
+        </SheetFooter>
+        </ScrollArea>
 
-      {state?.errors &&
-        <p className="text-sm text-slate-200">{state.message}</p>
-      }
-
-      </ScrollArea>
-
-      {isLoadingSynchronize && <p className="w-full text-center text-base font-semibold text-slate-400">
-        Loading🔄 Synchronizing album...,<br />please wait🙏
-      </p>}
-      <SheetFooter>
-      <div className="w-full flex flex-col items-start justify-center ">
-        <LinkList 
-        gdriveId={albumDetail.gdrive_id ?? -1}
-        isNewAlbum={albumDetail.gdrive_id == null}
-        albumId={album.id}
-        links={albumLinks ?? []}
-        />
-      </div>
-      </SheetFooter>
     </SheetContent>
   </Sheet>
   )
