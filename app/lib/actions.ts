@@ -30,9 +30,10 @@ export async function getAlbums(email:string) {
 
 const CreateAlbumSchema = z.object({
     email: z.string().email().min(3),
-    title: z.string().max(100).min(3),
-    description: z.string().max(320)
+    title: z.string().max(100, {message: "title is a maximum of 100 characters"}).min(3),
+    description: z.string().max(320, {message: "description is a maximum of 320 characters"})
 })
+
 
 export type CreateAlbumState = {
     errors?: {
@@ -66,18 +67,12 @@ export async function insertAlbum(prevState: CreateAlbumState,formData: FormData
         const result = await sql`INSERT INTO albums (title, description, user_email) 
         VALUES (${title}, ${description}, ${email});`        
 
-        
-        console.log("sukses cuy🔥");
-        console.log(result);
-
-        
         // return {message: 'success for creating your album'}      
     } catch (error) {
-        console.log("🔥 error happen :");
-        console.log(error);
+        revalidatePath('/albums/create');
         return {errors: JSON.stringify(error),message: 'Database Error: Failed to create album data.',}      
     }
-
+    
     revalidatePath('/albums/create');
     redirect('/dashboard')
 }
