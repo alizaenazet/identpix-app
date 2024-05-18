@@ -14,12 +14,7 @@ export default function Page() {
     
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const userSession: UserSession = session
-    
-    console.log("🦠 userSession");
-    console.log(userSession);
-    
-    
+    const userSession: UserSession = session    
     
   return (
     <DashboardPage
