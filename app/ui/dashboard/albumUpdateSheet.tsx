@@ -43,7 +43,6 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const albumLinks = albumDetail.links ?? []
   return (
     <Sheet>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <SheetTrigger asChild disabled={isDeleting} >
       <Button variant="outline">{isDeleting ? "Deleting.." : "✏️ Edit"}</Button>
     </SheetTrigger>
@@ -79,14 +78,14 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
 
       <form className="grid gap-4 py-4" action={dispatch}>
         <Input id="albumId" name="albumId" value={album.id} className="col-span-3 hidden" />
-        <div className="grid grid-cols-4 items-center gap-4">
+        <div className="grid grid-cols-4 items-center gap-4 pr-1">
           <Label htmlFor="title" className="text-right">
             Title
           </Label>
           <Input id="title" name="title" defaultValue={album.title} className="col-span-3" />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="description" className="text-right">
+        <div className="grid grid-cols-4 items-center gap-4 pr-1">
+          <Label htmlFor="description" className="text-right ">
             Description
           </Label>
           <Input id="description" name="description" defaultValue={album.description} className="col-span-3" />
@@ -94,23 +93,20 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
         <div className="grid grid-cols-4 items-start justify-start gap-4 ">
         <Label  className="text-right">
           </Label>
-          <div className="col-span-3 flex flex-row gap-1 justify-start items-start">
+          <div className="col-span-3 flex flex-row gap-1 justify-start items-start flex-wrap">
           <SheetClose asChild >
-            <Button variant="destructive" onClick={async () => {setIsDeleting(true) ; await deleteAlbum(album.id)}}> Delete</Button>
+            <Button variant="destructive" size="sm" onClick={async () => {setIsDeleting(true) ; await deleteAlbum(album.id)}}> Delete</Button>
           </SheetClose>
           <SheetClose disabled={isLoadingSynchronize} asChild>
-            <Button type="submit">Save changes</Button>
+            <Button size="sm" type="submit">Save changes</Button>
           </SheetClose>
             <Button className="bg-green-600" 
             type="button"
+            size="sm"
             disabled={!albumDetail.ispublished && albumLinks?.length < 1}
             onClick={ async () => {
-              console.log("rine loh cok");
               setIsLoadingSynchronize(true)
               const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
-              console.log("result cik kiw");
-              console.log(result);
-              
               setIsLoadingSynchronize(false)
             }}>
                 {isLoadingSynchronize ? "Loading🔄 Synchronizing album..., please wait🙏" : "Synchronize album"}
