@@ -47,11 +47,8 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             return token;
         },
         async session({ session, token, }) {
-            const userToken = token
-            
-            // session.user = token;
+            session.user = token;
             // session.accessToken = token.accessToken;
-            
             return session;
         },
     },

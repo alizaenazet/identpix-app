@@ -1,53 +1,44 @@
 "use client"
+import {IdentpixLogo} from "@/app/ui/identpixLogo"
+import React from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import Image  from "next/image";
+    Navbar, 
+    NavbarBrand, 
+    NavbarContent, 
+    NavbarItem, 
+    NavbarMenuToggle,
+    NavbarMenu,
+    NavbarMenuItem,
+    
+  } from "@nextui-org/navbar";
+
+  import {Button} from "@nextui-org/button";
 import { signOut } from "next-auth/react";
-import { UserSession } from "../definitions/auth/types";
 import Link  from "next/link";
-import { Button } from "@/components/ui/button";
 
-
-export default function Navbar({userSession}:{userSession:UserSession}) {
-  const user = userSession.user
+export default function App() {
   return (
-    <div className='w-full flex flex-row  flex-wrap gap-2 items-end justify-between mt-2 md:mt-6'>
-            <div className='w-max flex flex-row gap-2 items-end justify-start'>
-                <DropdownMenu>
-                <DropdownMenuTrigger>
-                <Image
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                src={user.image! as string}
-                width={55}
-                height={55}
-                alt='icon'
-                className='rounded-lg'
-                />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className='pl-2'>
-                    <DropdownMenuLabel>Menu</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className='bg-slate-100 mb-1' onClick={() => signOut()}>Sing-out</DropdownMenuItem>
-                </DropdownMenuContent>
-                </DropdownMenu>
-            <div className='flex flex-col  items-start justify-center'>
-                <p className='text-sm md:text-base font-semibold'>{user?.name}</p>
-                <p className='text-sm md:md:text-base text-normal'>{user?.email}</p>
-            </div>
-            </div>
-
-            <Link className='hidden md:block' href={"/albums/create"}>
-                <Button className='md:text-sm'>
-                    Create album
-                </Button>
-            </Link>
-        </div>
+    <Navbar shouldHideOnScroll>
+      <NavbarBrand>
+        <Link href={"/dashboard"}>
+            <IdentpixLogo />
+        </Link>
+        <Link href={"/dashboard"}>
+            <p className="font-bold text-inherit">IdentPix</p>
+        </Link>
+      </NavbarBrand>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      </NavbarContent>
+      <NavbarContent justify="end">
+        <NavbarItem className="hidden lg:flex">
+          <Link href="#">Login</Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Button onClick={() => signOut()} color="primary" variant="flat">
+            LogOut
+          </Button>
+        </NavbarItem>
+      </NavbarContent>
+    </Navbar>
   );
 }

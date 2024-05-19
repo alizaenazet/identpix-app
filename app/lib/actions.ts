@@ -1,5 +1,4 @@
 'use server';
-
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -12,50 +11,28 @@ import { getServerSession } from "next-auth/next"
 import { UserSession } from '@/app/definitions/auth/types';
 
 import {s3Client} from '@/app/lib/s3-client'
-import { DeleteObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import Papa from 'papaparse';
 
 export async function getAlbums(email:string) {
     
-    try {
-        noStore()
+    noStore()
+    const result = await sql`SELECT * FROM albums WHERE user_email = ${email}`
+    // const result = await sql`SELECT * FROM albums`
 
-        const result = await sql`
-        SELECT 
-        albums.id,
-        albums.title,
-        albums.description,
-        albums.isPublished,
-        albums.user_email,
-        gdrive_links.id as gdrive_id,
-        gdrive_links.links
-        FROM 
-            albums
-        LEFT JOIN 
-            gdrive_links ON albums.id = gdrive_links.album_id
-         WHERE user_email = ${email}`
-        
-    
-        if (result.rows[0]) {
-            return result.rows as [Albums]
-        }
-
-        revalidatePath('/dashboard')
-
-    } catch (error) {
-        console.error(error)
+    if (result.rows[0]) {
+        return result.rows
     }
 
-    return []
+    return null
 }
 
 
 const CreateAlbumSchema = z.object({
     email: z.string().email().min(3),
-    title: z.string().max(100, {message: "title is a maximum of 100 characters"}).min(3),
-    description: z.string().max(320, {message: "description is a maximum of 320 characters"})
+    title: z.string().max(100).min(3),
+    description: z.string().max(320)
 })
-
 
 export type CreateAlbumState = {
     errors?: {
@@ -88,13 +65,19 @@ export async function insertAlbum(prevState: CreateAlbumState,formData: FormData
     try {
         const result = await sql`INSERT INTO albums (title, description, user_email) 
         VALUES (${title}, ${description}, ${email});`        
-    
+
+        
+        console.log("sukses cuy🔥");
+        console.log(result);
+
+        
+        // return {message: 'success for creating your album'}      
     } catch (error) {
-        revalidatePath('/albums/create');
-        console.error(error)
+        console.log("🔥 error happen :");
+        console.log(error);
         return {errors: JSON.stringify(error),message: 'Database Error: Failed to create album data.',}      
     }
-    
+
     revalidatePath('/albums/create');
     redirect('/dashboard')
 }
@@ -123,21 +106,33 @@ export async function updatetAlbum(prevState: UpdateAlbumState,formData: FormDat
          title : formData.get('title')?.toString(),
          description : formData.get('description')?.toString()
     })
+
+     console.log(formData);
      
     if (!validateFields.success) {
+        console.log(validateFields.error);
+        
         return {
             errors: validateFields.error.flatten().fieldErrors,
             message: 'Missing Fields. Failed to Update Invoice.',
         };
       }
 
+
+      
       const {albumId,title,description} = validateFields.data
+      console.log("🔥 const {email,title,description} = validateFields.data");
+      console.log(albumId);
+      console.log(title);
+      console.log(description);
       
     try {
         const result = await sql`UPDATE albums
         SET title = ${title}, description = ${description}
         WHERE id = ${albumId};
         `        
+        console.log("sukses cuy🔥");
+        console.log(result);
     } catch (error) {
         console.log("🔥 error happen :");
         console.log(error);
@@ -148,7 +143,44 @@ export async function updatetAlbum(prevState: UpdateAlbumState,formData: FormDat
 }
 
 
+export async function getAlbumDetailById(albumId: string) {
+    try {
+        console.log(albumId);
+        
+        noStore()
+        const result = await sql`
+        SELECT 
+        albums.id,
+        albums.title,
+        albums.description,
+        albums.isPublished,
+        albums.user_email,
+        gdrive_links.id as gdrive_id,
+        gdrive_links.links
+        FROM 
+            albums
+        LEFT JOIN 
+            gdrive_links ON albums.id = gdrive_links.album_id
+        WHERE 
+            albums.id = ${albumId};`;
+
+        if (result.rows.length > 0) {
+            return result.rows
+        }
+
+    } catch (error) {
+        console.log("🔥 error happen :");
+        console.log(error);
+        return {message: 'Database Error: Failed to load an album data.',}      
+    }
+
+    return null
+}
+
+
 export async function addNewGdriveLink(formData: FormData) {
+
+    console.log("masuk addNEWGdriveLink");
     
     const gdriveId:string = formData.get('gdriveId') as string
     const link:string = formData.get('link') as string
@@ -162,12 +194,14 @@ export async function addNewGdriveLink(formData: FormData) {
 
     const folderId = getFolderIdFromUrl(link)
     if (folderId == null) {
+        console.log("invalid folder link");
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
     }
     
     const resultCheck = await linkCheck(`https://drive.google.com/drive/folders/${folderId}?usp=sharing`,userSession.user.accessToken as string)
     
     if (!resultCheck) {
+        console.log("denied permission to access ");
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
     }
 
@@ -188,7 +222,8 @@ export async function addNewGdriveLink(formData: FormData) {
             return true
         }
     } catch (error) {
-        console.error(error);
+        console.log("🔥 error happen :");
+        console.log(error);
         return {message: 'Database Error: Failed to add new links value of  an album data.',}      
     }
 
@@ -216,7 +251,8 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
             return true
         }
     } catch (error) {
-        console.error(error);
+        console.log("🔥 error happen :");
+        console.log(error);
         return {message: 'Database Error: Failed to remove a link value of  an album data.',}      
     }
 }
@@ -225,8 +261,8 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
 
 
 export async function createGdrive(formData: FormData) {
-    console.log("masuk cok");
-    
+    console.log("masuk addNEWGdriveLink");
+
     const link:string = formData.get("link") as string
     const albumId: string = formData.get("albumId") as string
 
@@ -235,10 +271,13 @@ export async function createGdrive(formData: FormData) {
     const session = await getServerSession(authOptions)
   
     const userSession: UserSession = session as UserSession
-
+    console.log("session");
+    console.log(session);
 
     const folderId = getFolderIdFromUrl(link)
     if (folderId == null) {
+        console.log("invalid folder link");
+        
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
     }
     
@@ -246,7 +285,10 @@ export async function createGdrive(formData: FormData) {
     console.log(resultCheck);
 
     if (!resultCheck) {
+        console.log("denied permission to access ");
+        
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
+        
     }
     
     // insert new value into `gdrive_links` table
@@ -270,7 +312,8 @@ export async function createGdrive(formData: FormData) {
         }
 
     } catch (error) {
-        console.error(error);
+        console.log("🔥 error happen :");
+        console.log(error);
         return {message: 'Database Error: Failed to add a link value of  an album data.',}      
     }
     
@@ -278,51 +321,30 @@ export async function createGdrive(formData: FormData) {
 
 }
 
-export async function deleteAlbum(
-    prevState: {message:string|undefined}, 
-    formData: FormData) {
-
-    const albumId = formData.get('id') as string
-    const isPublished = (formData.get('isPublished') as string)
-
+export async function deleteAlbum(albumId:string) {
     try {
         noStore()
         const result = await sql`
         DELETE FROM albums
         WHERE id = ${albumId};
         `
-        
-        if (result.rowCount > 0) {
-            // cek is the album already published for delete the csv in file storge
-            if (isPublished == "1") {
-                const command = new DeleteObjectCommand({
-                    Bucket: "gdrive-ids",
-                    Key: albumId,
-                  });
-                
-                  try {
-                    const response = await s3Client.send(command)
-                    if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
-                        return {message: 'Something wrong, try again later'}
-                    }
-                  } catch (err) {
-                    console.error(err);
-                  }
-            }
 
+        if (result.rowCount > 0) {
             revalidatePath('/dashboard');
-            return {message: 'success deleting album'}
+            return true
         }
-        
-        return {message: 'Something wrong, try again later'}
+        revalidatePath('/dashboard')
+        return false
     } catch (error) {
-        console.error(error);
+        console.log("🔥 error happen :");
+        console.log(error);
         return {message: 'Database Error: Failed to remove an album data.',}      
     }
 }
 
 
-export async function synchAlbumFiles(gdriveLinksId: number, albumId:string) {
+export async function synchAlbumFiles(gdriveLinksId: string, albumId:string) {
+    console.log("\n\n\n\n\n🔥masuk synch album");
     
     const session = await getServerSession(authOptions)
     const userSession: UserSession = session as UserSession
@@ -349,6 +371,7 @@ export async function synchAlbumFiles(gdriveLinksId: number, albumId:string) {
         
         const status = response.status;
         if (status >= 300) {
+            console.log("Response status:", status);
             return [];
         }
 
@@ -366,6 +389,8 @@ export async function synchAlbumFiles(gdriveLinksId: number, albumId:string) {
     const imagesArrays = await Promise.all(fetchPromises);
     images = imagesArrays.flat(); // Menggabungkan semua array menjadi satu array
 
+    console.log(typeof images);
+    console.log(images);
     var csv = Papa.unparse([images]);
     
     const input = {
@@ -374,22 +399,20 @@ export async function synchAlbumFiles(gdriveLinksId: number, albumId:string) {
         "Key": albumId
     };
     const command = new PutObjectCommand(input);
-    try {
-        const response = await s3Client.send(command)
+    const response = await s3Client.send(command)
+    
+    console.log("response kiw 🔥");
+    console.log(response);
 
-        if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
-            return false
-        }
-        
-        await sql`
-        UPDATE albums
+    if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
+        return false
+    }
+    
+    await sql`
+    UPDATE albums
         SET ispublished = true
         WHERE id = ${albumId};        
-        `
-
-    } catch (error) {
-        console.error(error);
-    }
+    `
     revalidatePath('/dashboard')
     return true
 }
