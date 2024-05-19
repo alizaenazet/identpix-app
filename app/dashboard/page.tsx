@@ -18,13 +18,17 @@ import { Albums } from "@/app/definitions/types";
 import { getAlbums } from '@/app/lib/actions';
 import {authOptions} from '@/app/lib/authOptions';
 import { getServerSession } from "next-auth/next"
+import { redirect } from 'next/navigation';
 
 export default async function Page() {
 
   const session = await getServerSession(authOptions)
-  console.log("session cuy");
-  console.log(session);
+  if (!session) {
+    redirect('/login')
+  }
+  
   const userSession = session as UserSession
+
 
   const data = await getAlbums(userSession.user.email!)
   

@@ -16,15 +16,20 @@ import Papa from 'papaparse';
 
 export async function getAlbums(email:string) {
     
-    noStore()
-    const result = await sql`SELECT * FROM albums WHERE user_email = ${email}`
-    // const result = await sql`SELECT * FROM albums`
+    try {
+        noStore()
+        const result = await sql`SELECT * FROM albums WHERE user_email = ${email}`
+        // const result = await sql`SELECT * FROM albums`
+    
+        if (result.rows[0]) {
+            return result.rows as [Albums]
+        }
 
-    if (result.rows[0]) {
-        return result.rows
+    } catch (error) {
+        
     }
 
-    return null
+    return []
 }
 
 
@@ -316,7 +321,12 @@ export async function createGdrive(formData: FormData) {
 
 }
 
-export async function deleteAlbum(albumId:string) {
+export async function deleteAlbum(
+    prevState: {message:string|undefined}, 
+    formData: FormData) {
+
+    const albumId = formData.get('id') as string
+
     try {
         noStore()
         const result = await sql`
@@ -324,12 +334,13 @@ export async function deleteAlbum(albumId:string) {
         WHERE id = ${albumId};
         `
 
+        console.log(result);
         if (result.rowCount > 0) {
             revalidatePath('/dashboard');
-            return true
+            return {message: 'success deleting album'}
         }
-        revalidatePath('/dashboard')
-        return false
+        
+        return {message: 'Something wrong, try again later'}
     } catch (error) {
         console.log("🔥 error happen :");
         console.log(error);
