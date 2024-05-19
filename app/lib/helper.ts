@@ -22,6 +22,7 @@ export async function linkCheck(link:string, access_token:string) {
             redirect: "follow"
         });
         const result = await response.json(); // Konversi response ke text
+        console.log(myHeaders);
         
         // cek apakah folder bersifat publik
         return result.mimeType == "application/vnd.google-apps.folder" && (response.status <= 400)

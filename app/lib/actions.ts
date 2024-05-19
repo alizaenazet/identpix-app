@@ -229,7 +229,7 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
 
 
 export async function createGdrive(formData: FormData) {
-    console.log("masuk cok");
+    console.log("masuk kontol");
     
     const link:string = formData.get("link") as string
     const albumId: string = formData.get("albumId") as string
@@ -247,7 +247,7 @@ export async function createGdrive(formData: FormData) {
     }
     
     const resultCheck = await linkCheck(`https://drive.google.com/drive/folders/${folderId}?usp=sharing`,userSession.user.accessToken as string)
-    console.log(resultCheck);
+    console.log("kontol "  +resultCheck);
 
     if (!resultCheck) {
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
@@ -281,7 +281,7 @@ export async function createGdrive(formData: FormData) {
         return {message: 'Database Error: Failed to add a link value of  an album data.',}      
     }
     
-    return false
+    revalidatePath('/dashboard');
 
 }
 
