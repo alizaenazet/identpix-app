@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { insertAlbum } from "@/app/lib/actions";
 import { useSession } from "next-auth/react";
-import { useFormState } from "react-dom";
+import { useFormState,useFormStatus } from "react-dom";
 import { useState } from "react";
 import { redirect } from "next/navigation";
 import { toast } from "sonner"
@@ -20,6 +20,7 @@ export default function Page() {
   const initialState = { message: "", errors: {} };
   const [state,dispatch] = useFormState(insertAlbum,initialState)
   const errosState = state.errors as any
+  const { pending } = useFormStatus()
 
   return (
     <main className='flex h-screen flex-col  justify-center items-center p-16'>
@@ -38,7 +39,7 @@ export default function Page() {
                 <Input className="h-full" type="text" name="description" placeholder="description" />
                 {errosState?.description && <InputErrorMessage errs={errosState.description} />}
             </div>
-            <Button  className="w-full" type="submit" >Continue</Button>
+            <Button  className="w-full" type="submit" disabled={pending} >Continue</Button>
     </form>    
         {
           state?.message && <div hidden>

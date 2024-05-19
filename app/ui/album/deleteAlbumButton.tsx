@@ -7,11 +7,9 @@ import { useState } from "react";
 
 
 export default function DeleteAlbumButton({
-  setIsDeleting, 
   albumId,
   isPublished
 }:{
-  setIsDeleting:(status:boolean) => void,
   albumId: string,
   isPublished: boolean
 }) {
@@ -23,7 +21,7 @@ export default function DeleteAlbumButton({
     <form action={dispatch}>
       <input type="text" name="id" defaultValue={albumId} hidden />
       <input type="number" name="isPublished" defaultValue={isPublished ? 1 : 0} hidden />
-      <Button type="submit" variant="destructive" size="sm" onClick={() => setIsDeleting(true)}>Delete</Button>
+      <Button type="submit" variant="destructive" size="sm" >Delete</Button>
       {
           state?.message && <div hidden>
             { toast("Delete album", {

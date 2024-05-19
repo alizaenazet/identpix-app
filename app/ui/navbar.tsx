@@ -22,9 +22,7 @@ export default function Navbar({userSession}:{userSession:UserSession}) {
                 <DropdownMenu>
                 <DropdownMenuTrigger>
                 <Image
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                src={user.image! as string}
+                src={user.picture as string}
                 width={55}
                 height={55}
                 alt='icon'

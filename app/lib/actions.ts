@@ -139,8 +139,7 @@ export async function updatetAlbum(prevState: UpdateAlbumState,formData: FormDat
         WHERE id = ${albumId};
         `        
     } catch (error) {
-        console.log("🔥 error happen :");
-        console.log(error);
+        console.error(error);
         return {errors: JSON.stringify(error),message: 'Database Error: Failed to create album data.',}      
     }
 
@@ -183,9 +182,7 @@ export async function addNewGdriveLink(formData: FormData) {
         WHERE id = ${albumId};
         `;
 
-        if (result.rowCount > 0) {
-            console.log("kiw");
-            console.log(result);
+        if (result.rowCount > 0) {;
             
             revalidatePath('/dashboard');
             return true
@@ -213,9 +210,7 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
         WHERE id = ${albumId};         
         `
         
-        if (result.rowCount > 0) {
-            console.log("kiw");
-            console.log(result);
+        if (result.rowCount > 0) {;
             revalidatePath('/dashboard');
             return true
         }
@@ -229,7 +224,6 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
 
 
 export async function createGdrive(formData: FormData) {
-    console.log("masuk kontol");
     
     const link:string = formData.get("link") as string
     const albumId: string = formData.get("albumId") as string
@@ -247,7 +241,6 @@ export async function createGdrive(formData: FormData) {
     }
     
     const resultCheck = await linkCheck(`https://drive.google.com/drive/folders/${folderId}?usp=sharing`,userSession.user.accessToken as string)
-    console.log("kontol "  +resultCheck);
 
     if (!resultCheck) {
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
@@ -268,8 +261,6 @@ export async function createGdrive(formData: FormData) {
         SET ispublished = false
         WHERE id = ${albumId};        
         `
-        console.log("bneer");
-        console.log(result);
         
         if (result.rowCount > 0) {
             revalidatePath('/dashboard');

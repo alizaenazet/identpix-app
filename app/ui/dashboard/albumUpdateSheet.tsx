@@ -109,7 +109,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
           <div className=" w-full flex flex-row flex-warp gap-1.5 items-start justify-start">
           <SheetClose asChild >
                 <DeleteAlbumButton 
-                albumId={album.id} setIsDeleting={(status:boolean) => setIsDeleting(status)} 
+                albumId={album.id} 
                 isPublished={album.ispublished}
                 />
           </SheetClose>

@@ -22,14 +22,12 @@ export async function linkCheck(link:string, access_token:string) {
             redirect: "follow"
         });
         const result = await response.json(); // Konversi response ke text
-        console.log(myHeaders);
         
         // cek apakah folder bersifat publik
         return result.mimeType == "application/vnd.google-apps.folder" && (response.status <= 400)
 
         } catch (error) {
-        console.log("🔥 error happen :");
-        console.log(error);
+        console.error(error);
         return {message: 'Invalid attachment link',}      
         }
 
