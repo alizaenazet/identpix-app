@@ -1,19 +1,23 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Image from "next/image"
-import Link from "next/link"
-import { signIn } from "next-auth/react";
-import { useSession } from "next-auth/react";
+import { signIn,useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button"
 import { redirect } from 'next/navigation';
+import LoadingDisplay from '../ui/loadingDisplay';
 
 
 export default function Page() {
-    const {data:session} = useSession()
+    const { data: session, status } = useSession()
 
+    console.log("session");
+    console.log(session);
+    console.log(status);
+    
     if (session) {
-        redirect('/dashboard')
+      console.log("session");
+        // redirect('/dashboard')
     }
     
     return (
@@ -27,7 +31,7 @@ export default function Page() {
                 </p>
               </div>
               <div className="grid gap-4">
-                <Button variant="outline" className="w-full" onClick={() => signIn('google')}>
+                <Button variant="outline" className="w-full" onClick={() => signIn('google',{callbackUrl:"/dashboard"})}>
                   Login with Google
                 </Button>
               </div>
