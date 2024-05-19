@@ -77,8 +77,8 @@ export async function insertAlbum(prevState: CreateAlbumState,formData: FormData
         console.log(error);
         return {errors: JSON.stringify(error),message: 'Database Error: Failed to create album data.',}      
     }
-
-    revalidatePath('/albums/create');
+    
+    revalidatePath('/dashboard');
     redirect('/dashboard')
 }
 
@@ -218,6 +218,9 @@ export async function addNewGdriveLink(formData: FormData) {
         `;
 
         if (result.rowCount > 0) {
+            console.log("kiw");
+            console.log(result);
+            
             revalidatePath('/dashboard');
             return true
         }
@@ -246,7 +249,8 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
         `
         
         if (result.rowCount > 0) {
-            
+            console.log("kiw");
+            console.log(result);
             revalidatePath('/dashboard');
             return true
         }
@@ -306,6 +310,9 @@ export async function createGdrive(formData: FormData) {
         SET ispublished = false
         WHERE id = ${albumId};        
         `
+        console.log("bneer");
+        console.log(result);
+        
         if (result.rowCount > 0) {
             revalidatePath('/dashboard');
             return true
