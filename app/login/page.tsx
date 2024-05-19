@@ -1,16 +1,15 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Image from "next/image"
-import Link from "next/link"
-import { signIn } from "next-auth/react";
-import { useSession } from "next-auth/react";
+import { signIn,useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button"
 import { redirect } from 'next/navigation';
+import LoadingDisplay from '../ui/loadingDisplay';
 
 
 export default function Page() {
-    const {data:session} = useSession()
+    const { data: session, status } = useSession()
 
     if (session) {
         redirect('/dashboard')
@@ -27,20 +26,21 @@ export default function Page() {
                 </p>
               </div>
               <div className="grid gap-4">
-                <Button variant="outline" className="w-full" onClick={() => signIn('google')}>
+                <Button variant="outline" className="w-full" onClick={() => signIn('google',{callbackUrl:"/dashboard"})}>
                   Login with Google
                 </Button>
               </div>
             </div>
           </div>
           <div className="hidden bg-muted lg:block">
-            <Image
-              src="/placeholder.svg"
-              alt="Image"
-              width="1920"
-              height="1080"
-              className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+            <div className='w-full h-full flex flex-col gap-3 items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500'>
+              <Image 
+              src={"/images/login_image.png"}
+              width={607}
+              height={405}
+              alt=''
+              />
+            </div>
           </div>
         </div>
       )

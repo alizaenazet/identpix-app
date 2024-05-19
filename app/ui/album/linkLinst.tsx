@@ -5,13 +5,12 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 
 import { createGdrive,removeGdriveLink,addNewGdriveLink } from "@/app/lib/actions";
-import { revalidatePath } from "next/cache"
 
 export default function LinkList({gdriveId,albumId,links,isNewAlbum}:{gdriveId: number,albumId:string,links: string[],isNewAlbum: boolean}) {
       return (
     <div className='mt-6 col-span-3 w-full h-max flex flex-col items-start justify-start gap-3 '>
         <div className='w-full flex flex-col items-start justify-start gap-2'>
-        <Label htmlFor="username" className="text-left">
+        <Label  className="text-left">
                 G-drive link
         </Label>
         <form action={addNewGdriveLink} className={` h-max w-full flex felx-row gap-2 justify-start ${isNewAlbum ? "hidden" : ""}`} >
@@ -37,10 +36,13 @@ export default function LinkList({gdriveId,albumId,links,isNewAlbum}:{gdriveId: 
             {links.map((link) => (
             <>
                 <div key={link} className="text-sm flex flex-row justify-between items-end gap-1">
-                <p className="text-base">{link}</p>
+                <p className="text-blue-400 text:sm md:text-base">
+                    <a href={`https://drive.google.com/drive/u/0/folders/${link}`}>
+                    {link}
+                    </a>
+                </p>
                 <Button size={'icon'}  onClick={async () => {
                     await removeGdriveLink(albumId,gdriveId,link)
-                    revalidatePath("/dashboard")
                     }} className="h-fit py-1" variant="outline">
                     <span className="text-red-600 material-symbols-outlined">
                     delete</span></Button>
