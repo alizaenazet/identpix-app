@@ -27,8 +27,7 @@ export async function linkCheck(link:string, access_token:string) {
         return result.mimeType == "application/vnd.google-apps.folder" && (response.status <= 400)
 
         } catch (error) {
-        console.log("🔥 error happen :");
-        console.log(error);
+        console.error(error);
         return {message: 'Invalid attachment link',}      
         }
 
@@ -104,3 +103,11 @@ export function getFolderIdFromUrl(url: string){
 
     return imagesIds;
     }
+
+  export function checkUserTokenExpired(expires:string) {
+    const expirationDate = new Date(expires);
+    const currentDate = new Date();
+      
+      return currentDate > expirationDate;
+  }
+    

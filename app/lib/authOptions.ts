@@ -1,5 +1,6 @@
 import GoogleProvider from "next-auth/providers/google"
 import { NextAuthOptions } from "next-auth";
+import { redirect } from 'next/navigation'
 
 
 const scopes = [
@@ -35,12 +36,22 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             if (account) {
                 token.accessToken = account.access_token;
             }
+            const currentDate  = Math.floor(Date.now() / 1000)
             
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            if (currentDate > token!.exp) {
+                redirect('/login')
+            }
+
             return token;
         },
         async session({ session, token, }) {
+            const userToken = token
+            
             session.user = token;
             // session.accessToken = token.accessToken;
+            
             return session;
         },
     },
