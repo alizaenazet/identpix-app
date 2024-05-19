@@ -19,6 +19,7 @@ export async function getAlbums(email:string) {
     
     try {
         noStore()
+
         const result = await sql`
         SELECT 
         albums.id,
@@ -38,6 +39,8 @@ export async function getAlbums(email:string) {
         if (result.rows[0]) {
             return result.rows as [Albums]
         }
+
+        revalidatePath('/dashboard')
 
     } catch (error) {
         console.error(error)
@@ -222,7 +225,8 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
 
 
 export async function createGdrive(formData: FormData) {
-
+    console.log("masuk cok");
+    
     const link:string = formData.get("link") as string
     const albumId: string = formData.get("albumId") as string
 
@@ -288,7 +292,6 @@ export async function deleteAlbum(
         WHERE id = ${albumId};
         `
         
-        console.log(result);
         if (result.rowCount > 0) {
             // cek is the album already published for delete the csv in file storge
             if (isPublished == "1") {

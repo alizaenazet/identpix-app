@@ -17,12 +17,14 @@ import { Button } from "@/components/ui/button";
 export default function Navbar({userSession}:{userSession:UserSession}) {
   const user = userSession.user
   return (
-    <div className='w-full flex flex-row  flex-wrap gap-2 items-end justify-between'>
+    <div className='w-full flex flex-row  flex-wrap gap-2 items-end justify-between mt-2 md:mt-6'>
             <div className='w-max flex flex-row gap-2 items-end justify-start'>
                 <DropdownMenu>
                 <DropdownMenuTrigger>
                 <Image
-                src={user.picture as string}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                src={user.image! as string}
                 width={55}
                 height={55}
                 alt='icon'

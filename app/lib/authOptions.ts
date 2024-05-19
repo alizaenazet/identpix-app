@@ -41,13 +41,15 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (currentDate > token!.exp) {
-                redirect('/sign-in')
+                redirect('/login')
             }
 
             return token;
         },
         async session({ session, token, }) {
-            session.user = token;
+            const userToken = token
+            
+            // session.user = token;
             // session.accessToken = token.accessToken;
             
             return session;

@@ -11,13 +11,8 @@ import LoadingDisplay from '../ui/loadingDisplay';
 export default function Page() {
     const { data: session, status } = useSession()
 
-    console.log("session");
-    console.log(session);
-    console.log(status);
-    
     if (session) {
-      console.log("session");
-        // redirect('/dashboard')
+        redirect('/dashboard')
     }
     
     return (
@@ -38,13 +33,14 @@ export default function Page() {
             </div>
           </div>
           <div className="hidden bg-muted lg:block">
-            <Image
-              src="/placeholder.svg"
-              alt="Image"
-              width="1920"
-              height="1080"
-              className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+            <div className='w-full h-full flex flex-col gap-3 items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500'>
+              <Image 
+              src={"/images/login_image.png"}
+              width={607}
+              height={405}
+              alt=''
+              />
+            </div>
           </div>
         </div>
       )

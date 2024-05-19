@@ -40,8 +40,6 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const initialState = { message: "", errors: {} };
   const [state,dispatch] = useFormState(updatetAlbum,initialState)
   const [isLoadingSynchronize, setIsLoadingSynchronize] = useState(false)
-
-  console.log(album);
   
   return (
     <Sheet>

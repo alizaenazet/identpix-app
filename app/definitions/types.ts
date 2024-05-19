@@ -5,6 +5,6 @@ export type Albums ={
     description: string,
     ispublished: boolean,
     user_email: string,
-    gdrive_id: string | null
+    gdrive_id: number | null
     links: string[] | null
 }

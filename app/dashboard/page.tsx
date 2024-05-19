@@ -23,18 +23,19 @@ import { redirect } from 'next/navigation';
 export default async function Page() {
 
   const session = await getServerSession(authOptions)
+
   if (!session) {
     redirect('/login')
   }
   
+  
   const userSession = session as UserSession
-
-
+  
+  
   const data = await getAlbums(userSession.user.email!)
   
   return (
     <main className='py-3 px-7 flex flex-col items-center justify-start gap-7'>
-        <h1 className='font-bold text-xl md:text-5xl'>Dashboard</h1>
         <div className='w-full h-screen flex flex-col items-start justify-start gap-9'>
           <Navbar userSession={userSession} />
         <div className='w-full flex flex-col gap-1 items-start justify-start'>
