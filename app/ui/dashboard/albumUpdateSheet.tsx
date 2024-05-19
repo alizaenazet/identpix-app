@@ -41,24 +41,8 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const [state,dispatch] = useFormState(updatetAlbum,initialState)
   const [isLoadingSynchronize, setIsLoadingSynchronize] = useState(false)
 
-  const fetcher = (url:string) => fetch(url).then(r => r.json())
-  const { data, error,isLoading } = useSWR(`/api/albums/detail/${album.id}`, fetcher)
+  console.log(album);
   
-
-  if (isLoading) {
-    return <div className="flex flex-col w-full h-full items-center justify-center">
-        <p className="text-sm font-medium">Loading for ${album.title} album</p>
-    </div>
-  }
-
-  try {
-    data[0]
-  } catch (error) {
-    redirect("/dashboard")
-  }
-  
-  const albumDetail = data[0]
-  const albumLinks = albumDetail.links ?? []
   return (
     <Sheet>
     <SheetTrigger asChild disabled={isDeleting} >
@@ -126,15 +110,18 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
 
           <div className=" w-full flex flex-row flex-warp gap-1.5 items-start justify-start">
           <SheetClose asChild >
-                <DeleteAlbumButton albumId={album.id} setIsDeleting={(status:boolean) => setIsDeleting(status)} />
+                <DeleteAlbumButton 
+                albumId={album.id} setIsDeleting={(status:boolean) => setIsDeleting(status)} 
+                isPublished={album.ispublished}
+                />
           </SheetClose>
           <Button className="bg-green-600" 
               type="button"
               size="sm"
-              disabled={!albumDetail.ispublished && albumLinks?.length < 1}
+              disabled={!album.ispublished && (album.links! ?? []).length < 1}
               onClick={ async () => {
                 setIsLoadingSynchronize(true)
-                const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
+                const result = await synchAlbumFiles(album.gdrive_id!,album.id)              
                 setIsLoadingSynchronize(false)
               }}>
                   {isLoadingSynchronize ? <span className="animate-spin material-symbols-outlined">sync</span>: "Synchronize album"}
@@ -151,10 +138,10 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
         <SheetFooter>
         <div className=" w-full flex flex-col items-start justify-center ">
           <LinkList 
-          gdriveId={albumDetail.gdrive_id ?? -1}
-          isNewAlbum={albumDetail.gdrive_id == null}
+          gdriveId={album.gdrive_id ?? -1}
+          isNewAlbum={album.gdrive_id == null}
           albumId={album.id}
-          links={albumLinks ?? []}
+          links={album.links ?? []}
           />
         </div>
         </SheetFooter>
