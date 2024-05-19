@@ -11,7 +11,7 @@ import { getServerSession } from "next-auth/next"
 import { UserSession } from '@/app/definitions/auth/types';
 
 import {s3Client} from '@/app/lib/s3-client'
-import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import Papa from 'papaparse';
 
 export async function getAlbums(email:string) {
@@ -326,16 +326,37 @@ export async function deleteAlbum(
     formData: FormData) {
 
     const albumId = formData.get('id') as string
+    const isPublished = (formData.get('isPublished') as string)
 
+
+    console.log("deleteing for id " + albumId);
+    
     try {
         noStore()
         const result = await sql`
         DELETE FROM albums
         WHERE id = ${albumId};
         `
-
+        
         console.log(result);
         if (result.rowCount > 0) {
+            // cek is the album already published for delete the csv in file storge
+            if (isPublished == "1") {
+                const command = new DeleteObjectCommand({
+                    Bucket: "gdrive-ids",
+                    Key: albumId,
+                  });
+                
+                  try {
+                    const response = await s3Client.send(command)
+                    if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
+                        return {message: 'Something wrong, try again later'}
+                    }
+                  } catch (err) {
+                    console.error(err);
+                  }
+            }
+
             revalidatePath('/dashboard');
             return {message: 'success deleting album'}
         }
@@ -406,9 +427,6 @@ export async function synchAlbumFiles(gdriveLinksId: string, albumId:string) {
     };
     const command = new PutObjectCommand(input);
     const response = await s3Client.send(command)
-    
-    console.log("response kiw 🔥");
-    console.log(response);
 
     if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
         return false

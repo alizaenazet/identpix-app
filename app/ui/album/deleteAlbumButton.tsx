@@ -8,10 +8,12 @@ import { useState } from "react";
 
 export default function DeleteAlbumButton({
   setIsDeleting, 
-  albumId
+  albumId,
+  isPublished
 }:{
   setIsDeleting:(status:boolean) => void,
-  albumId: string
+  albumId: string,
+  isPublished: boolean
 }) {
   const initialState = { message: "" };
   const [state,dispatch] = useFormState(deleteAlbum,initialState)
@@ -20,6 +22,7 @@ export default function DeleteAlbumButton({
   return (
     <form action={dispatch}>
       <input type="text" name="id" defaultValue={albumId} hidden />
+      <input type="number" name="isPublished" defaultValue={isPublished ? 1 : 0} hidden />
       <Button type="submit" variant="destructive" size="sm" onClick={() => setIsDeleting(true)}>Delete</Button>
       {
           state?.message && <div hidden>
