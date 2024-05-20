@@ -105,7 +105,11 @@ git commit -m "<category: do something; do some other things>"
 ### Getting Started
 
 **Clone project**
-`git clone https://github.com/Pijaraya-Team/identpix-app.git ; cd identpix-app`
+
+```
+git clone https://github.com/Pijaraya-Team/identpix-app.git ; cd identpix-app
+```
+
 *clone and enter the project*
 ---
 
@@ -170,3 +174,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 
+
+### Interaction example 
+
+** Synch album **
+![diagram-export-20-5-2024-13 01 17](https://github.com/Pijaraya-Team/identpix-app/assets/96227680/48d84946-b2d2-42de-80c1-56832db3c79c)
