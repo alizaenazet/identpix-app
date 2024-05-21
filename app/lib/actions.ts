@@ -148,7 +148,7 @@ export async function updatetAlbum(prevState: UpdateAlbumState,formData: FormDat
 
 
 export async function addNewGdriveLink(formData: FormData) {
-    
+
     const gdriveId:string = formData.get('gdriveId') as string
     const link:string = formData.get('link') as string
     const albumId:string = formData.get('albumId') as string
@@ -224,7 +224,6 @@ export async function removeGdriveLink(albumId:string,gdriveId: number,value:str
 
 
 export async function createGdrive(formData: FormData) {
-    
     const link:string = formData.get("link") as string
     const albumId: string = formData.get("albumId") as string
 
@@ -246,6 +245,7 @@ export async function createGdrive(formData: FormData) {
         return {message: 'invalid google drive link, makse sure given public access folder link as viewer or more',}      
     }
     
+    
     // insert new value into `gdrive_links` table
     // change the status into draft
     try {
@@ -261,6 +261,10 @@ export async function createGdrive(formData: FormData) {
         SET ispublished = false
         WHERE id = ${albumId};        
         `
+
+        console.log("result");
+        console.log(result);
+        
         
         if (result.rowCount > 0) {
             revalidatePath('/dashboard');

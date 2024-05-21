@@ -4,7 +4,6 @@ import { redirect } from "next/navigation"
 import { useRef,useEffect, useState } from "react"
 import useSWR from 'swr'
 import * as faceapi from 'face-api.js';
-import Image from "next/image";
 import { useRouter } from 'next/router';
 import {
     Card,
@@ -99,6 +98,9 @@ export default function Page({ params }: { params: { id: string } }) {
       
       
 
+      console.log("data");
+      console.log(data);
+      
   return (
     <div className='w-screen flex flex-col gap-2 items-center justify-center py-6 px-2'>
         <p className='font-bold text-xl mb-9 text-center'>Discover all your saved photos <br /> here 🔍</p>
