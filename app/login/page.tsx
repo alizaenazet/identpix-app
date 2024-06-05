@@ -13,6 +13,13 @@ export default function Page() {
     const {data:session} = useSession()
 
     if (session) {
+      if ((session.user?.exp! as number) <= Math.floor(Date.now() / 1000)) {
+        console.log("token already expired");
+      }
+
+      console.log("session detected");
+      console.log(session);
+      
         redirect('/dashboard')
     }
     

@@ -55,7 +55,7 @@ export default function Page({ params }: { params: { id: string } }) {
           await faceapi.nets.faceExpressionNet.loadFromUri('/models');
             
         })();
-      }, []);
+    }, []);
 
 
     if (isLoading) {
@@ -142,6 +142,7 @@ export default function Page({ params }: { params: { id: string } }) {
             (data.result.data[0].length > 0) && data.result.data[0].map((id:any,index:number) => 
                 <div className='mt-3' hidden key={id + index} >
                     <p className='font-black'>{index + 1}</p>
+                    {/* coba pake link https://drive.usercontent.google.com/download?id=1TKzqwHKOhktGLE2-2-nkcoWlIzeg-858&export=view&authuser=1 */}
                     <img id={`images-${index}`} src={`/api/photos/forward-image/${id}`}   alt=""/>
                 </div>
             )

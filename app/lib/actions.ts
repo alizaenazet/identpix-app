@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { sql } from '@vercel/postgres'; 
-import { Albums } from '../definitions/types';
+import { Albums, FaceLabel } from '../definitions/types';
 import { unstable_noStore as noStore } from 'next/cache';
 import { linkCheck,getFolderIdFromUrl,getImagesIds } from "@/app/lib/helper";
 import { authOptions } from "@/app/lib/authOptions"
@@ -13,6 +13,103 @@ import { UserSession } from '@/app/definitions/auth/types';
 import {s3Client} from '@/app/lib/s3-client'
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import Papa from 'papaparse';
+import { signOut } from 'next-auth/react';
+
+export async function synchAlbumFiles(gdriveLinksId: string, albumId:string) {
+    console.log("\n\n\n\n\n🔥masuk synch album");
+    
+    const session = await getServerSession(authOptions)
+    const userSession: UserSession = session as UserSession
+    const access_token = userSession.user.accessToken as string
+    const result = await sql`
+    SELECT links FROM gdrive_links
+        WHERE id = ${gdriveLinksId};
+    `
+
+    const links = result.rows[0].links
+    let images:string[] = []
+
+    try {
+        
+    } catch (error) {
+        console.log("error on get images ids");
+        console.log(JSON.stringify(error));
+        console.log(error);
+           
+    }
+    // Memperbaiki penggunaan async dalam loop
+    const fetchPromises = links.map(async (link: any) => {
+        
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${access_token}`);
+        
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=%27${link}%27+in+parents+and+mimeType+contains+%27image/%27`, {
+            method: "GET",
+            headers: myHeaders,
+            redirect: "follow"
+        });
+        
+        const status = response.status;
+        if (status >= 300) {
+            console.log("🌍Response status:", status);
+            if (response.statusText == "Unauthorized"){
+                redirect('/login')
+            }
+            return null;
+        }
+
+        const result = await response.json();
+        const supportedFileTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
+        const resultListimageObjct = result.files || [];
+        const imagesIds: string[] = resultListimageObjct
+            .filter((image: any) => supportedFileTypes.includes(image.mimeType))
+            .map((image: any) => image.id);
+
+        return imagesIds;
+    });
+
+    // Menunggu semua fetch selesai
+    const imagesArrays = await Promise.all(fetchPromises);
+    images = imagesArrays.flat(); // Menggabungkan semua array menjadi satu array
+
+    
+    console.log("success to get all image ids")
+
+    
+
+    return images ?? []
+
+}
+
+export async function uploadAlbumJson(files:Map<number, FaceLabel>,albumId: string) {
+    const facesLabelsArray = Array.from(files.values());
+    // Step 2: Serialize to JSON
+    const json = JSON.stringify(facesLabelsArray);
+    const input = {
+        "Body": json,
+        "Bucket": "gdrive-files-id",
+        "Key": albumId
+    };
+
+    const command = new PutObjectCommand(input);
+    const response = await s3Client.send(command)
+    
+    console.log("response kiw 🔥");
+    console.log(response);
+    console.log(albumId);
+
+    if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
+        return false
+    }
+    
+    await sql`
+    UPDATE albums
+        SET ispublished = true
+        WHERE id = ${albumId};        
+    `
+    revalidatePath('/dashboard')
+    return true
+}
 
 export async function getAlbums(email:string) {
     
@@ -350,76 +447,3 @@ export async function deleteAlbum(albumId:string) {
 }
 
 
-export async function synchAlbumFiles(gdriveLinksId: string, albumId:string) {
-    console.log("\n\n\n\n\n🔥masuk synch album");
-    
-    const session = await getServerSession(authOptions)
-    const userSession: UserSession = session as UserSession
-    const access_token = userSession.user.accessToken as string
-    const result = await sql`
-    SELECT links FROM gdrive_links
-        WHERE id = ${gdriveLinksId};
-    `
-
-    const links = result.rows[0].links
-    let images:string[] = []
-
-    // Memperbaiki penggunaan async dalam loop
-    const fetchPromises = links.map(async (link: any) => {
-        
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", `Bearer ${access_token}`);
-        
-        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=%27${link}%27+in+parents+and+mimeType+contains+%27image/%27`, {
-            method: "GET",
-            headers: myHeaders,
-            redirect: "follow"
-        });
-        
-        const status = response.status;
-        if (status >= 300) {
-            console.log("Response status:", status);
-            return [];
-        }
-
-        const result = await response.json();
-        const supportedFileTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
-        const resultListimageObjct = result.files || [];
-        const imagesIds: string[] = resultListimageObjct
-            .filter((image: any) => supportedFileTypes.includes(image.mimeType))
-            .map((image: any) => image.id);
-
-        return imagesIds;
-    });
-
-    // Menunggu semua fetch selesai
-    const imagesArrays = await Promise.all(fetchPromises);
-    images = imagesArrays.flat(); // Menggabungkan semua array menjadi satu array
-
-    console.log(typeof images);
-    console.log(images);
-    var csv = Papa.unparse([images]);
-    
-    const input = {
-        "Body": csv,
-        "Bucket": "gdrive-ids",
-        "Key": albumId
-    };
-    const command = new PutObjectCommand(input);
-    const response = await s3Client.send(command)
-    
-    console.log("response kiw 🔥");
-    console.log(response);
-
-    if (response.$metadata.httpStatusCode! >= 400 && response.$metadata.attempts! < 1) {
-        return false
-    }
-    
-    await sql`
-    UPDATE albums
-        SET ispublished = true
-        WHERE id = ${albumId};        
-    `
-    revalidatePath('/dashboard')
-    return true
-}
