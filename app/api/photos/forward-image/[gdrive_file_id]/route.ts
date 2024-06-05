@@ -14,6 +14,7 @@ export async function GET(request: Request,{ params }: { params: { gdrive_file_i
         return new Response(Buffer.from(buffer), {
             headers: {
                 'Access-Control-Allow-Origin': '*',
+                'Content-Type': "image/*"
             }
         }
         )

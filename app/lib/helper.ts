@@ -104,3 +104,11 @@ export function getFolderIdFromUrl(url: string){
 
     return imagesIds;
     }
+
+  export function checkUserTokenExpired(expires:string) {
+    const expirationDate = new Date(expires);
+    const currentDate = new Date();
+      
+      return currentDate > expirationDate;
+  }
+    

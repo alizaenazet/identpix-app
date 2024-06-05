@@ -5,20 +5,18 @@ import Papa from 'papaparse';
 
 
 export async function GET(request: Request,{ params }: { params: { key: string } }) {
-    
-    
     try {
         const input = {
-            "Bucket": "gdrive-ids",
+            "Bucket": "gdrive-files-id",
             "Key": params.key,
           };
           
           const command = new GetObjectCommand(input);
           const response = await (await s3Client.send(command))
                     .Body?.transformToString() // transform into string for can be parse into json
-    
-          let result = Papa.parse(response ?? "",{delimiter: ""})
-          return NextResponse.json({"result":result})
+          
+          const result = JSON.parse(response!) ?? []
+          return NextResponse.json(result)
     } catch (error) {
         return NextResponse.json(error)
     }

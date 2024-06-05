@@ -35,6 +35,7 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import CopyButton from "@/app/ui/dashboard/copyButton";
 import { revalidatePath } from "next/cache";
+import SynchButton from "@/app/ui/album/synchButton";
 
 
 export default  function AlbumUpdateSheet({album} : {album: Albums}) {
@@ -119,17 +120,13 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
             <SheetClose disabled={isLoadingSynchronize} asChild>
               <Button size="sm" type="submit">Save changes</Button>
             </SheetClose>
-              <Button className="bg-green-600" 
-              type="button"
-              size="sm"
-              disabled={!albumDetail.ispublished && albumLinks?.length < 1}
-              onClick={ async () => {
-                setIsLoadingSynchronize(true)
-                const result = await synchAlbumFiles(albumDetail.gdrive_id,album.id)              
-                setIsLoadingSynchronize(false)
-              }}>
-                  {isLoadingSynchronize ? <span className="animate-spin material-symbols-outlined">sync</span>: "Synchronize album"}
-                </Button>
+              <SynchButton 
+                isPublished={!albumDetail.ispublished && albumLinks?.length < 1}
+                gdrive_id={albumDetail.gdrive_id}
+                albumId={album.id}
+                setIsLoadingSynchronize={setIsLoadingSynchronize}
+                isLoadingSynchronize={isLoadingSynchronize}
+              />
             </div>
           </div>
         </form>

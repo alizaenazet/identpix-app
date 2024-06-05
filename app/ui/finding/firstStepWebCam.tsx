@@ -72,7 +72,6 @@ export default function FirstStepWebCam({
             new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();        
-    
 
         
         if (camera!.detection.score > 0.7) {

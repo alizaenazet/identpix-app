@@ -8,3 +8,9 @@ export type Albums ={
     gdrive_id: number | null
     links: string[] | null
 }
+
+export type FaceLabel = {
+    label: number,
+    descriptors: Float32Array[] | undefined,
+    imageIds: string[]
+}
