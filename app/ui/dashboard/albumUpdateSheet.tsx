@@ -19,15 +19,12 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardFooter
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
 
-import { deleteAlbum,updatetAlbum, synchAlbumFiles } from "@/app/lib/actions";
+import {updatetAlbum, synchAlbumFiles } from "@/app/lib/actions";
 import LinkList from "@/app/ui/album/linkLinst";
 import useSWR from 'swr'
 import { Albums } from "@/app/definitions/types";
@@ -35,27 +32,16 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import CopyButton from "@/app/ui/dashboard/copyButton";
 import { revalidatePath } from "next/cache";
-import SynchButton from "@/app/ui/album/synchButton";
-
+import DeleteAlbumButton from "@/app/ui/album/deleteAlbumButton";
+import { redirect } from "next/navigation";
+import SynchButton from "../album/synchButton";
 
 export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const [isDeleting,setIsDeleting] = useState(false)
   const initialState = { message: "", errors: {} };
   const [state,dispatch] = useFormState(updatetAlbum,initialState)
   const [isLoadingSynchronize, setIsLoadingSynchronize] = useState(false)
-
-  const fetcher = (url:string) => fetch(url).then(r => r.json())
-  const { data, error,isLoading } = useSWR(`/api/albums/detail/${album.id}`, fetcher)
   
-
-  if (isLoading) {
-    return <div className="flex flex-col w-full h-full items-center justify-center">
-        <p className="text-sm font-medium">Loading for ${album.title} album</p>
-    </div>
-  }
-
-  const albumDetail = data[0]  
-  const albumLinks = albumDetail.links ?? []
   return (
     <Sheet>
     <SheetTrigger asChild disabled={isDeleting} >
@@ -81,7 +67,7 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
                         <CopyButton text={`https://identpix-app.vercel.app/album/${album.id}`}/>
                       </p>
                     }
-                  {!album.ispublished && <p className="text-sm font-light text-red-500">
+                  {!album.ispublished && <p className="text-sm font-light text-left text-red-500">
                     Your album need to Synchronize for can be accessible publicly
                     </p>}
               </div>
@@ -94,43 +80,50 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
           
         </SheetHeader>
         <Card>
-        <CardContent>
+        <CardContent className="p-2 md:p-6">
 
         <form className="grid gap-4 py-4" action={dispatch}>
           <Input id="albumId" name="albumId" defaultValue={album.id} className="col-span-3 hidden" />
-          <div className="grid grid-cols-4 items-center gap-4 pr-1">
+          <div className="flex flex-col gap-1 items-start justify-center pr-1">
             <Label htmlFor="title" className="text-right">
               Title
             </Label>
-            <Input id="title" name="title" defaultValue={album.title} className="col-span-3" />
+            <Input id="title" name="title" defaultValue={album.title} className="w-full" />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 pr-1">
-            <Label htmlFor="description" className="text-right ">
+          <div className="flex flex-col gap-1 items-start justify-center pr-1">
+            <Label htmlFor="description" className="text-right text-sm">
               Description
             </Label>
-            <Input id="description" name="description" defaultValue={album.description} className="col-span-3" />
+            <Input id="description" name="description" defaultValue={album.description} className="w-full" />
           </div>
           <div className="grid grid-cols-4 items-start justify-start gap-4 ">
-          <Label  className="text-right">
-            </Label>
-            <div className="col-span-3 flex flex-row gap-1 justify-start items-start flex-wrap">
-            <SheetClose asChild >
-              <Button variant="destructive" size="sm" onClick={async () => {setIsDeleting(true) ; await deleteAlbum(album.id)}}> Delete</Button>
-            </SheetClose>
+            <div className="flex flex-row gap-1 justify-start items-start flex-wrap">
             <SheetClose disabled={isLoadingSynchronize} asChild>
               <Button size="sm" type="submit">Save changes</Button>
             </SheetClose>
-              <SynchButton 
-                isPublished={!albumDetail.ispublished && albumLinks?.length < 1}
-                gdrive_id={albumDetail.gdrive_id}
-                albumId={album.id}
-                setIsLoadingSynchronize={setIsLoadingSynchronize}
-                isLoadingSynchronize={isLoadingSynchronize}
-              />
             </div>
           </div>
         </form>
         </CardContent>
+        <CardFooter className="p-2 md:px-6 md:py-0 md:pb-6">
+
+          <div className=" w-full flex flex-row flex-warp gap-1.5 items-start justify-start">
+          <SheetClose asChild >
+                <DeleteAlbumButton 
+                albumId={album.id} 
+                isPublished={album.ispublished}
+                />
+          </SheetClose>
+          <SynchButton 
+                isPublished={album.ispublished && album.links!.length < 1}
+                gdrive_id={album.gdrive_id?.toString() ?? ""}
+                albumId={album.id}
+                setIsLoadingSynchronize={setIsLoadingSynchronize}
+                isLoadingSynchronize={isLoadingSynchronize}
+              />
+
+          </div>
+        </CardFooter>
         </Card>
 
         {state?.errors &&
@@ -140,10 +133,10 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
         <SheetFooter>
         <div className=" w-full flex flex-col items-start justify-center ">
           <LinkList 
-          gdriveId={albumDetail.gdrive_id ?? -1}
-          isNewAlbum={albumDetail.gdrive_id == null}
+          gdriveId={album.gdrive_id ?? -1}
+          isNewAlbum={album.gdrive_id == null}
           albumId={album.id}
-          links={albumLinks ?? []}
+          links={album.links ?? []}
           />
         </div>
         </SheetFooter>

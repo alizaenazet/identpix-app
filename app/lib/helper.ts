@@ -27,8 +27,7 @@ export async function linkCheck(link:string, access_token:string) {
         return result.mimeType == "application/vnd.google-apps.folder" && (response.status <= 400)
 
         } catch (error) {
-        console.log("🔥 error happen :");
-        console.log(error);
+        console.error(error);
         return {message: 'Invalid attachment link',}      
         }
 
@@ -38,19 +37,15 @@ export async function linkCheck(link:string, access_token:string) {
 
 export function getFolderIdFromUrl(url: string){
     try {
-      // Parse the URL
-      const parsedUrl = new URL(url);
-  
-      // Extract pathname and split into components
-      const pathSegments = parsedUrl.pathname.split('/');
-  
-      // The ID is expected to be the last part of the path in the specific pattern
-      if (pathSegments[1] === 'drive' && pathSegments[2] === 'folders' && pathSegments[3]) {
-        return pathSegments[3];
-      } else {
-        // Not a valid Google Drive folder URL
-        return null;
-      }
+      const regex = /\/folders\/([a-zA-Z0-9-_]+)|id=([a-zA-Z0-9-_]+)/;
+      const match = url.match(regex);
+
+    // Return the matched ID or null if no match is found
+    if (match) {
+        return match[1] || match[2] || null;
+    }
+    return null;
+    
     } catch (error) {
       // Error handling for invalid URLs
       console.error('Invalid URL provided:', error);
