@@ -19,6 +19,7 @@ const scopes = [
 export const authOptions: NextAuthOptions = {  // Configure one or more authentication providers
     session: {
         strategy: "jwt",
+        maxAge: 59 * 60,
     },
     providers: [
         GoogleProvider({
@@ -38,6 +39,7 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             }
             const currentDate  = Math.floor(Date.now() / 1000)
             
+            
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (currentDate > token!.exp) {
@@ -47,11 +49,17 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             return token;
         },
         async session({ session, token, }) {
+            const currentDate  = Math.floor(Date.now() / 1000)
+            console.log("token status");
+            console.log(token);
+            console.log(`token exp: ${token!.exp}`);
+            console.log(`current date: ${currentDate}`);
+            console.log(currentDate >= (token!.exp as number));
+            
             const userToken = token
             
             session.user = token;
             // session.accessToken = token.accessToken;
-            
             return session;
         },
     },

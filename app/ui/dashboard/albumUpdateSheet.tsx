@@ -34,6 +34,7 @@ import CopyButton from "@/app/ui/dashboard/copyButton";
 import { revalidatePath } from "next/cache";
 import DeleteAlbumButton from "@/app/ui/album/deleteAlbumButton";
 import { redirect } from "next/navigation";
+import SynchButton from "../album/synchButton";
 
 export default  function AlbumUpdateSheet({album} : {album: Albums}) {
   const [isDeleting,setIsDeleting] = useState(false)
@@ -113,17 +114,13 @@ export default  function AlbumUpdateSheet({album} : {album: Albums}) {
                 isPublished={album.ispublished}
                 />
           </SheetClose>
-          <Button className="bg-green-600" 
-              type="button"
-              size="sm"
-              disabled={!album.ispublished && (album.links! ?? []).length < 1}
-              onClick={ async () => {
-                setIsLoadingSynchronize(true)
-                const result = await synchAlbumFiles(album.gdrive_id!,album.id)              
-                setIsLoadingSynchronize(false)
-              }}>
-                  {isLoadingSynchronize ? <span className="animate-spin material-symbols-outlined">sync</span>: "Synchronize album"}
-            </Button>
+          <SynchButton 
+                isPublished={album.ispublished && album.links!.length < 1}
+                gdrive_id={album.gdrive_id?.toString() ?? ""}
+                albumId={album.id}
+                setIsLoadingSynchronize={setIsLoadingSynchronize}
+                isLoadingSynchronize={isLoadingSynchronize}
+              />
 
           </div>
         </CardFooter>
