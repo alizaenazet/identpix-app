@@ -52,6 +52,17 @@ export const authOptions: NextAuthOptions = {  // Configure one or more authenti
             const userToken = token
             
             session.user = token;
+
+            const currentDate  = Math.floor(Date.now() / 1000)
+            console.log("token status");
+            console.log(token);
+            console.log(`token exp: ${token!.exp}`);
+            console.log(`current date: ${currentDate}`);
+            console.log(currentDate >= (token!.exp as number));
+            
+            const userToken = token
+            
+            session.user = token;
             // session.accessToken = token.accessToken;
             return session;
         },

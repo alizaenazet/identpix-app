@@ -104,6 +104,9 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsProcess(false);
   }
 
+      console.log("data");
+      console.log(data);
+      
   return (
     <div className="w-screen flex flex-col gap-2 items-center justify-center py-6 px-2">
       <p className="font-bold text-xl mb-9 text-center">
