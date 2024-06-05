@@ -180,10 +180,6 @@ export default function SynchButton(
           if (isLoadingSynchronize && !isProcessing && currentBatchIndex < imageIds.length) {
             processBatch();
           }
-
-        // if (isLoadingSynchronize) {
-        //     imageIds.forEach(url => fetchAndProcessImage(url));
-        // }
       }, [imageIds, isProcessing, currentBatchIndex]); // Dependencies: dijalankan ulang jika `imageIds` berubah
     
       // Effect untuk memantau apakah semua gambar telah diproses
