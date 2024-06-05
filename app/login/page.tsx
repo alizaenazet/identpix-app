@@ -13,6 +13,9 @@ export default function Page() {
     const {data:session} = useSession()
 
     if (session) {
+      console.log("session detected");
+      console.log(session);
+      
         redirect('/dashboard')
     }
     
