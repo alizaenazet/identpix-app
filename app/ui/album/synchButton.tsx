@@ -60,12 +60,8 @@ export default function SynchButton(
 
     useEffect(() => {
         const fetchAndProcessImage = async (url:string) => {
-            console.log("kepanggil cuy")
-            console.log(url)
             try {
             const tempImage = await faceapi.fetchImage(`/api/photos/forward-image/${url}`)
-            console.log(tempImage instanceof HTMLImageElement);
-            console.log("\n\nsuccess load image");
             tempImage.id = url
             // get the image
             await processImage(tempImage as unknown as HTMLImageElement);
@@ -79,17 +75,13 @@ export default function SynchButton(
           try {
             // TODO: call descriptor function
 
-            console.log('Face descriptors: simulate for processs image' );
             
             const results = await faceapi
             .detectAllFaces(imageBlob)
             .withFaceLandmarks()
             .withFaceDescriptors()
-            console.log("imageBlob.id")
-            console.log(imageBlob.id)
             
             if (labeledDescriptors.length < 1) {
-                console.log("init awal");
                 
                 results.forEach((fd,i) => {
                     const tempNewLabel = labeledDescriptors.length
@@ -107,19 +99,13 @@ export default function SynchButton(
                     facesLabels.set(tempNewLabel, tempNewFacesLabels);  
                 })
 
-                console.log("facesLabels");
-                console.log(facesLabels);
                 
             }
 
             const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors)
-            console.log("🪻after detect faces");
             
             results.forEach((fd,i) => {
             const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
-            console.log("🥰bestMatch")
-            console.log(bestMatch)
-            console.log(bestMatch.toString())
 
             if (bestMatch.label == "unknown" || bestMatch.distance >= 0.52) {
                 const tempNewLabel = labeledDescriptors.length
@@ -139,7 +125,6 @@ export default function SynchButton(
                 
             }else{
                 const labelIndex = parseInt(bestMatch.label);
-                console.log("🔥match broww " + labelIndex)
                 if (bestMatch.distance <= 0.35) {
                     labeledDescriptors[labelIndex].descriptors.push(fd.descriptor)
                 }
@@ -151,15 +136,11 @@ export default function SynchButton(
                     const updatedFaceLabel = { ...existingFaceLabel, imageIds: updatedImageIds };
                     facesLabels.set(labelIndex, updatedFaceLabel);
                 } else {
-                    console.log(`Label ${labelIndex} does not exist.`);
                 }
             }
 
             })
             
-            console.log("\n\n\n\n\n\ 🌍🩷success load image");
-            console.log(labeledDescriptors.length);
-            console.log(typeof imageBlob)
           } catch (error) {
             console.error('Process image failed:', error);
           }finally {
@@ -185,11 +166,8 @@ export default function SynchButton(
       // Effect untuk memantau apakah semua gambar telah diproses
       useEffect(() => {
         if (processedImagesCount === imageIds.length && imageIds.length > 0 && currentBatchIndex >= imageIds.length) {
-            console.log("✅\n✅ fetch image success")
             
             labeledDescriptors.forEach((val,i) => {
-                console.log("\nindexof: i " + val.label)
-                console.log(facesLabels.get(i))
                 let tempInitFaceLabel = facesLabels?.get(parseInt(val.label))
                 tempInitFaceLabel!.descriptors = val.descriptors
                 tempInitFaceLabel!.imageIds = tempInitFaceLabel?.imageIds.filter((value, index, self) =>  self.indexOf(value) === index) ?? []
@@ -197,8 +175,6 @@ export default function SynchButton(
                 facesLabels?.set(i, tempInitFaceLabel!)
             })
 
-            console.log("JSON.stringify(facesLabels)");
-            console.log(facesLabels);
             uploadAlbumResult()
         }else {
             console.log("📦masih sisah " + (imageIds.length - processedImagesCount));
