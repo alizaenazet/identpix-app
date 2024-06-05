@@ -97,10 +97,6 @@ export default function Page({ params }: { params: { id: string } }) {
       new Float32Array(reference.descriptors[0])
     );
     if (bestMatch.label != "unknown") {
-      console.log("match wooy");
-      console.log(bestMatch);
-      console.log(bestMatch.label);
-      console.log(bestMatch.distance);
       setImagesOfMatch([...data[parseInt(bestMatch.label)].imageIds]);
     }else {
         setIsNotFound(true)
