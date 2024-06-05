@@ -392,6 +392,7 @@ export async function createGdrive(formData: FormData) {
         
     }
     
+    
     // insert new value into `gdrive_links` table
     // change the status into draft
     try {
@@ -410,6 +411,7 @@ export async function createGdrive(formData: FormData) {
         console.log("bneer");
         console.log(result);
         
+        
         if (result.rowCount > 0) {
             revalidatePath('/dashboard');
             return true
@@ -421,7 +423,7 @@ export async function createGdrive(formData: FormData) {
         return {message: 'Database Error: Failed to add a link value of  an album data.',}      
     }
     
-    return false
+    revalidatePath('/dashboard');
 
 }
 
